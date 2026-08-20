@@ -63,6 +63,50 @@ Open README.md
 A footnote renders in a muted style at the bottom of the step.
 </walkthrough-footnote>
 
+## Probe agy on Linux
+
+<walkthrough-tutorial-duration duration="3"></walkthrough-tutorial-duration>
+
+LAB-01 measured the `agy` install on macOS only. Cloud Shell is Linux, so the
+install path, footprint and whether it survives a new session are all unknown
+— and Cloud Shell is where attendees actually run.
+
+First get the latest of this repo, since the probe script is new:
+
+```bash
+git pull --ff-only
+```
+
+Confirm `agy` is on the path here:
+
+```bash
+command -v agy && agy --version
+```
+
+If that prints nothing, `agy` is not installed in this session — say so
+rather than installing it blind, because *how* it gets installed is one of
+the things being measured.
+
+Now run the probe. It is read-only apart from one plugin install that it
+removes again, and every call is capped so an unauthenticated `agy` cannot
+hang the terminal:
+
+```bash
+bash scripts/probe-agy.sh 2>&1 | tee /tmp/agy-probe.txt
+```
+
+Then hand back the output:
+
+```bash
+cat /tmp/agy-probe.txt
+```
+
+<walkthrough-footnote>
+The probe answers: install path and owner, binary size, whether PATH survives
+a new shell, where config lands, whether the plugin surface works
+unauthenticated, the shape of the auth prompt, and memory at rest.
+</walkthrough-footnote>
+
 ## Done
 
 <walkthrough-conclusion-trophy></walkthrough-conclusion-trophy>
