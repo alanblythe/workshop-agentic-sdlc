@@ -409,8 +409,37 @@ CommonMark plus `<walkthrough-*>` directives; the codelab is CLaaT. Shipping
 both means two sources of truth for the same twelve steps unless one is
 generated from the other.
 
-`<walkthrough-project-setup>` works in an ephemeral session — confirmed by
-running it. The picker lists the user's projects and selecting one takes
-effect, even though the VM itself starts with no credentials. It does not
-substitute for `gcloud auth login --update-adc`, which is still what gives the
-shell and ADC something to authenticate with.
+### The project picker sets a variable, and nothing else
+
+Confirmed by running it. `<walkthrough-project-setup>` renders a working
+picker, and **`<walkthrough-project-id/>` substitutes the selected id into
+code blocks** — a block written as
+
+```
+export GOOGLE_CLOUD_PROJECT="<walkthrough-project-id/>"
+```
+
+renders as `export GOOGLE_CLOUD_PROJECT="ablythe-misc-2026"` once a project is
+chosen. Substitution happens at render time, in the panel.
+
+**But selecting a project does not configure the shell.** It sets the tutorial
+variable only. The guide must carry an explicit step that applies it, and the
+attendee must run that step:
+
+```bash
+export GOOGLE_CLOUD_PROJECT="<walkthrough-project-id/>"
+gcloud config set project "$GOOGLE_CLOUD_PROJECT"
+```
+
+**Nothing in the panel runs automatically.** Each code block carries two
+controls — insert-into-terminal and copy — and the attendee has to use one and
+then run the command. Cloud Shell does not execute code from a cloned repo on
+the reader's behalf, which is the right call for an untrusted repo and is also
+better teaching: the attendee sees every command before it runs.
+
+The consequence for step count: every "now configure X" instruction is a real
+step with a real click, not a side effect of the widget above it. A guide that
+stops at the picker leaves the shell pointing nowhere while looking configured.
+
+It also does not authenticate anything. `gcloud auth login --update-adc`
+remains required wherever the session has no credentials.
