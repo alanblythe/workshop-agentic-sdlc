@@ -157,6 +157,52 @@ about what an attendee runs.
 PATH persistence is a non-issue: `/usr/bin` is on the system PATH, so nothing
 needs a shell-profile entry.
 
+### `agy update` works — but writes to `/usr/bin`, so it does not persist
+
+`agy update` took Cloud Shell from **1.1.13 to 1.1.16**, matching the macOS
+cask. It updates the binary **in place**:
+
+```
+version      : 1.1.16
+which        : /usr/bin/agy
+```
+
+**`/usr/bin` is on the VM, not the persistent disk.** Cloud Shell persists only
+`$HOME` and rebuilds the rest, so the update is discarded whenever the VM
+recycles. Nothing lands in `~/.local/bin`.
+
+So updating is **an every-session step, not a preflight one**. Preflight cannot
+do it a week early and have it stick.
+
+**Which raises whether the lab should update at all.** The behaviour LAB-06
+depends on — root `plugin.json`, install-by-path, the
+`~/.gemini/config/plugins/` target, unauthenticated `plugin list` — is
+identical on 1.1.9, 1.1.13 and 1.1.16. Running latest costs every attendee a
+step every session and buys nothing yet measured.
+
+**Recommendation: do not update in the lab.** Pin the guide to what the image
+ships, and re-verify the plugin behaviour against the image version during the
+rehearsal (LAB-19/20). Add an update step only if a specific needed behaviour
+turns out to be missing — and if that happens, the step has to be repeated by
+every attendee on every reconnect, which is worth knowing before designing
+around it.
+
+### Authentication is a second login, and it works
+
+After the interactive login, the probe's print-mode call answered directly:
+
+```
+== auth state / prompt shape ==
+ok
+[exit 0]
+```
+
+`gcloud auth login --update-adc` does **not** authenticate `agy`; they hold
+separate grants with separate scopes. The lab needs both.
+
+The grant lives under `~/.gemini`, which is persistent — so unlike the binary
+update, authentication *does* survive between sessions.
+
 ### The plugin layout works on the Cloud Shell version
 
 This is the compatibility question LAB-06 depended on, and the answer is yes.
@@ -187,7 +233,7 @@ handling.
 | :--- | :--- | :--- |
 | Binary | 197 MB | 169 MB |
 | RSS at rest | **161 MB** | 88 MB |
-| `~/.gemini` on disk | **545 MB** | — |
+| `~/.gemini` on disk | **545 MB**, 562 MB after update + login | — |
 
 **`~/.gemini` at 545 MB is the number that matters.** A persistent Cloud Shell
 home is **4.8 GB** (3.0 GB free when measured), so Antigravity's config

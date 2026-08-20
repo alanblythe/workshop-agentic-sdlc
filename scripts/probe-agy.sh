@@ -32,9 +32,14 @@ dpkg -S "$(readlink -f "$AGY")" 2>/dev/null || echo "not owned by dpkg"
 grep -rhoE '(curl|wget|npm i(nstall)?|go install|brew install)[^|;&]*(antigravity|agy)[^|;&]*' \
   ~/.bash_history ~/.zsh_history 2>/dev/null | sort -u | head -5 || true
 
-hr "does it survive a new shell (PATH persistence)"
-grep -rn "antigravity\|/agy" ~/.bashrc ~/.profile ~/.bash_profile 2>/dev/null | head -5 \
-  || echo "nothing in shell profiles — PATH may not persist across sessions"
+hr "does the binary survive a session (persistence)"
+case "$(readlink -f "$AGY")" in
+  "$HOME"/*) echo "under \$HOME — persists across Cloud Shell sessions" ;;
+  *) echo "$(dirname "$(readlink -f "$AGY")") is on the VM, not the persistent disk."
+     echo "Cloud Shell persists only \$HOME, so any update here is lost when the VM recycles." ;;
+esac
+grep -rn "antigravity\|/agy" ~/.bashrc ~/.profile ~/.bash_profile 2>/dev/null | head -3 \
+  || echo "(no shell-profile PATH entry needed for a system path)"
 
 hr "config root"
 for d in ~/.gemini ~/.gemini/config ~/.gemini/config/plugins ~/.gemini/config/skills ~/.gemini/antigravity-cli/skills ~/.antigravity; do
