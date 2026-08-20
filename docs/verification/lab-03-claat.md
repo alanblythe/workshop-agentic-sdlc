@@ -419,6 +419,52 @@ CommonMark plus `<walkthrough-*>` directives; the codelab is CLaaT. Shipping
 both means two sources of truth for the same twelve steps unless one is
 generated from the other.
 
+### `agy` ships in the Cloud Shell image — there is no install step
+
+Confirmed in an **ephemeral** session, which is what makes it conclusive: a
+scratch `$HOME` cannot hold anything installed earlier.
+
+```
+$ command -v agy && agy --version
+/usr/bin/agy
+1.1.9
+```
+
+`/usr/bin` is outside `$HOME` and not writable without root, and the session
+badge reads *"You are using Cloud Shell's default image"*. So `agy` is
+preinstalled. **The 169 MB install LAB-01 worried about never happens on Cloud
+Shell**, and the lab needs no install step for it.
+
+**But the image lags.** It ships **1.1.9**; the macOS cask is **1.1.16**.
+Rehearsing locally does not tell you how attendees' `agy` behaves, so anything
+LAB-06 depends on must be checked against 1.1.9.
+
+### Ephemeral is a session state, with a one-click exit
+
+The session badge menu states it plainly:
+
+> **Untrusted** — You have indicated that this session is untrusted.
+> You are using Cloud Shell's default image.
+> Current session is in Ephemeral Mode. Your data will not be saved.
+> **Return to default Cloud Shell**
+
+Two things follow. Trust is a property of the **session**, set by the
+attendee, not an attribute of the repo. And **"Return to default Cloud Shell"
+exits ephemeral mode in one click** — which is a far better recovery
+instruction than anything conditional, because an attendee who lands in the
+wrong environment can simply leave it.
+
+The guide should name that menu: it is where an attendee can *see* which
+environment they are in, which is otherwise invisible.
+
+### `gcloud auth login --update-adc` works here
+
+Verified in an ephemeral Cloud Shell. It uses a **verification-code paste**
+flow — *"enter the verification code provided in your browser"* — not a
+loopback redirect, and reports `Application Default Credentials (ADC) were
+updated.` That is the headless-friendly path, in the environment attendees
+actually use.
+
 ### The project picker sets a variable, and nothing else
 
 Confirmed by running it. `<walkthrough-project-setup>` renders a working
