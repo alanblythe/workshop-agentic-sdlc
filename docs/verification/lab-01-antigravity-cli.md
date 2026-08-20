@@ -174,18 +174,30 @@ recycles. Nothing lands in `~/.local/bin`.
 So updating is **an every-session step, not a preflight one**. Preflight cannot
 do it a week early and have it stick.
 
-**Which raises whether the lab should update at all.** The behaviour LAB-06
-depends on — root `plugin.json`, install-by-path, the
-`~/.gemini/config/plugins/` target, unauthenticated `plugin list` — is
-identical on 1.1.9, 1.1.13 and 1.1.16. Running latest costs every attendee a
-step every session and buys nothing yet measured.
+**Decision: the lab updates `agy`.** The guide runs on the current release,
+not on whatever the image happens to carry — and the image carries different
+versions in different sessions (1.1.9 and 1.1.13 observed minutes apart), so
+pinning to it means pinning to nothing in particular.
 
-**Recommendation: do not update in the lab.** Pin the guide to what the image
-ships, and re-verify the plugin behaviour against the image version during the
-rehearsal (LAB-19/20). Add an update step only if a specific needed behaviour
-turns out to be missing — and if that happens, the step has to be repeated by
-every attendee on every reconnect, which is worth knowing before designing
-around it.
+What that costs, and what the design must therefore do:
+
+- **It is a lab step, every session, for every attendee.** Preflight cannot do
+  it a week early — the binary reverts with the VM. Put it early, before
+  anything depends on `agy`.
+- **An attendee who reconnects mid-lab must run it again.** Their session may
+  have recycled underneath them, silently reverting to the image version. The
+  guide should say so, and any later step that misbehaves should have
+  `agy --version` as its first diagnostic.
+- **The rehearsal must time it.** Its wall-clock is unmeasured and comes
+  straight out of the 90 minutes.
+- **Whether it needs `sudo` is unresolved.** `/usr/bin` normally requires root;
+  the tutorial keeps a `sudo agy update` fallback, and the rehearsal should
+  record which branch actually fires so the guide can state one command rather
+  than two.
+
+Note this does *not* buy correctness for LAB-06: the plugin behaviour it
+depends on is identical across 1.1.9, 1.1.13 and 1.1.16. It buys predictability
+— everyone in the room on the same version as the rehearsal.
 
 ### Authentication is a second login, and it works
 

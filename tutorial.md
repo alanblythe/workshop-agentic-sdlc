@@ -68,8 +68,14 @@ A footnote renders in a muted style at the bottom of the step.
 <walkthrough-tutorial-duration duration="2"></walkthrough-tutorial-duration>
 
 The image ships `agy` at `/usr/bin/agy`, and the version varies by session —
-1.1.9 and 1.1.13 have both been seen, against 1.1.16 from the macOS cask. The
-lab should not run on whatever the image happens to carry.
+1.1.9 and 1.1.13 have both been seen. The lab runs on the current release
+instead, so everyone is on the same one.
+
+> aside negative
+> This is a **every-session** step. `agy update` replaces the binary in
+> `/usr/bin`, which is on the VM rather than the persistent disk, so it is
+> discarded whenever Cloud Shell recycles. If you reconnect later, run it
+> again — and if anything misbehaves afterwards, check `agy --version` first.
 
 Record what you start with:
 
