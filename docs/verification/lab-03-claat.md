@@ -293,43 +293,86 @@ be an *Open in Cloud Shell* button — it has to be "open Cloud Shell, then
 - GitHub Pages hosting — deliberately not attempted; blocked on the repo
   decision.
 
-## Open in Cloud Shell is unusable for this lab
+## Open in Cloud Shell: ephemeral, and that is acceptable
 
 ![The Open in Cloud Shell dialog for a non-Google repo](../images/cloud-shell-ephemeral-warning.png)
 
-Confirmed live against `github.com/octocat/Hello-World`. The dialog appears
-before anything runs:
+A non-Google repo opens in **Ephemeral mode**. The same link against a
+Google-owned repo (`GoogleCloudPlatform/python-docs-samples`) shows no warning
+at all, so the allow list governs, not the URL form. An attendee's fork is
+never Google-owned.
 
-> This repo is not officially maintained by Google and is considered untrusted
-> by default.
->
-> **This session will run in Ephemeral mode and all files will be deleted on
-> session end.**
+The `Trust repo` checkbox does not gate the clone — `Confirm` proceeds with it
+unticked — and what ticking it changes was not tested.
 
-The same URL against a Google-owned repo
-(`GoogleCloudPlatform/python-docs-samples`) says only *"This repo is officially
-maintained by Google."* — no ephemeral warning and no checkbox. So the
-behaviour is governed by the Google-ownership allow list, not by the URL form.
+### What ephemeral actually costs
 
-**The `Trust repo` checkbox is optional and does not gate the clone** —
-`Confirm` proceeds with it unticked. What ticking it changes was not tested.
-Note the dialog states the ephemeral behaviour flatly, not as a consequence of
-leaving the box unticked, so nothing here suggests it is an opt-out. Either
-way the button cannot be relied on: a lab step whose environment depends on an
-attendee noticing an unexplained checkbox is not a lab step.
+Measured in a live ephemeral session on this repo.
 
-An attendee's fork is never Google-owned, so the button would hand them a
-scratch `$HOME` deleted at session end, with no credentials. The lab installs
-`agy` (169 MB) and authenticates — both would be discarded.
-
-**Decision: do not ship an Open in Cloud Shell button.** Cloud Shell itself is
-unaffected and remains the workstation; only the `cloudshell_git_repo` link is
-withdrawn. Step 2 of the guide sends the attendee to plain Cloud Shell and has
-them clone:
+**No credentials, confirmed:**
 
 ```
-https://shell.cloud.google.com/
-git clone https://github.com/OWNER/REPO && cd REPO
+$ gcloud auth list
+No credentialed accounts.
 ```
 
-That keeps the default, persistent, credentialed environment.
+![An ephemeral session has no credentialed accounts](../images/cloud-shell-no-credentials.jpg)
+
+The editor status bar reads `Sign in to Google` and `(no project)`.
+
+**`$HOME` is deleted at session end** — but not during the session. A
+90-minute lab runs inside one session, so the wipe only affects work carried
+*between* sessions.
+
+### Both costs are cheap to pay
+
+**Credentials: one step.** `gcloud auth login --update-adc` — `--update-adc`
+rather than plain `login`, because ADC is what `agents-cli` and the ADK read.
+
+**Toolchain: ~36 seconds.** Measured in the ephemeral VM:
+
+| Step | Wall-clock |
+|---|---|
+| `curl -fsSL https://astral.sh/uv/install.sh \| sh` | **1.7s** |
+| `uvx google-agents-cli setup` | **34.4s** |
+
+Node and npx are preinstalled (`v24.18.1` / `12.0.2`), and `/home` has 53 GB
+free, so nothing else is needed and disk is not a constraint.
+
+**Decision: keep the Open in Cloud Shell button.** A toolchain that reinstalls
+in ~36s does not need to survive between sessions, which removes the only real
+objection. Preflight keeps its week-early value on the GCP side — enabling APIs
+costs 10–15 minutes, and quota, org policy and Terraform all persist in the
+project. The toolchain install moves into the lab's first step.
+
+The remaining unknown is **`agy` on Linux**. LAB-01 established
+`brew install --cask antigravity-cli` on macOS arm64; Cloud Shell is Linux with
+no Homebrew, and neither the install path nor its duration has been measured.
+
+### The tutorial panel works
+
+![The Cloud Shell tutorial panel rendering beside the terminal](../images/cloud-shell-tutorial-panel.jpg)
+
+`&cloudshell_tutorial=tutorial.md` renders the guide in a side panel next to
+the terminal and editor — no window switching. Every directive rendered:
+
+- `<walkthrough-tutorial-duration>` shows per-step minutes, so **durations
+  survive this format too**
+- fenced blocks get a copy-to-terminal control
+- `<walkthrough-project-setup>` opens a real project picker
+- `<walkthrough-editor-open-file>` renders as a clickable action
+- `<walkthrough-footnote>` renders muted
+
+Steps come from heading level: `#` title, `##` step, `###` item, with
+Previous/Next.
+
+**But it is a second, incompatible format.** Cloud Shell tutorials are
+CommonMark plus `<walkthrough-*>` directives; the codelab is CLaaT. Shipping
+both means two sources of truth for the same twelve steps unless one is
+generated from the other.
+
+One caveat worth testing before relying on the panel: the project picker lists
+the user's projects, but that list comes from the Console UI using the browser
+session, **not** from the VM's gcloud — which has no credentials. So
+`<walkthrough-project-setup>` may appear to succeed while the shell still
+cannot call anything until `gcloud auth login` has run.
