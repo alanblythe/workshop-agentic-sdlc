@@ -37,52 +37,74 @@ opens the editor on it, and renders `tutorial.md` in a side pane.
 
 ### The app
 
-A **PR risk scorer**: reads a unified diff, reports a risk score, a tier, and
-the named reasons behind it.
+An **account health scorer**: reads a usage export, reports a health score, a
+tier, and the named reasons behind it.
 
-The feature you add is the scoring itself. It splits into two halves with a
-seam the spec declares before anyone writes code:
+```
+ACME Corp: AT RISK
+  seats down 40% over 3 months
+  no logins in 14 days
+  2 open P1 tickets
+```
+
+It starts from a request, not a spec:
+
+> **Flag accounts before they churn**
+>
+> CS finds out an account is unhappy when the cancellation email arrives. We
+> want a health signal per account so they can reach out first. Raised at two
+> QBRs now.
+
+That is unbuildable as written, and deliberately so. What counts as risk, what
+window matters, how many tiers there are, where the boundaries sit — none of it
+is stated, and all of it has to be decided before two parties can work in
+parallel.
+
+### The seam
 
 | Half | Owner | Contract |
 | --- | --- | --- |
-| `diff.py` | Coder agent | `parse_diff(text) -> list[FileChange]` |
-| `score.py` | You | `score(list[FileChange]) -> (score, tier, reasons)` |
+| `usage.py` | Coder agent | `parse_usage(csv) -> list[MonthSnapshot]` |
+| `score.py` | You | `score(list[MonthSnapshot]) -> (score, tier, reasons)` |
 
-`FileChange` is the seam. The spec fixes it, along with the exact scoring
-weights and tier thresholds, so that two parties working independently arrive
-at code that fits.
+`MonthSnapshot` is the seam. The spec fixes it, along with the exact weights
+and tier thresholds, so that two parties working independently arrive at code
+that fits.
 
 ### The contract
 
-Three tests, all emitted by the spec adversary and committed before either
-party starts. A contract is testable from both sides independently — that is
-what makes it a contract rather than a wish.
+Three tests, emitted by the spec adversary and committed before either party
+starts. A contract is testable from both sides independently — that is what
+makes it a contract rather than a wish.
 
 | Test | Run by | Asserts |
 | --- | --- | --- |
-| `test_parse_contract.py` | The agent, alone | `parse_diff(FIXTURE)` produces exactly this `list[FileChange]` |
-| `test_score_contract.py` | You, alone | `score(<longhand FileChange list>)` produces exactly this tier and reasons |
+| `test_parse_contract.py` | The agent, alone | `parse_usage(FIXTURE)` produces exactly this `list[MonthSnapshot]` |
+| `test_score_contract.py` | You, alone | `score(<longhand MonthSnapshot list>)` produces exactly this tier and reasons |
 | `test_integration.py` | Both, after merge | The two compose |
 
-The longhand `FileChange` list in your test is the seam, written out by hand.
+The longhand `MonthSnapshot` list in your test is the seam, written out by hand.
 
 ### The flow
 
-1. **Draft the spec.** What the risk scorer should do.
-2. **Harden it.** The spec adversary hunts for places two independent
-   implementers could reasonably disagree, and makes you resolve each one.
-3. **Take the contract.** The adversary emits the three tests. Commit them.
-4. **Dispatch.** Push, then send the agent your repo and the **commit SHA**. It
+1. **File the request.** `gh issue create -F docs/request.md`. Work starts where
+   work starts.
+2. **Draft the spec** from it.
+3. **Harden it.** The spec adversary hunts for places two independent
+   implementers could reasonably disagree, and makes you resolve each one. An
+   empty usage figure — is that zero, or unknown?
+4. **Take the contract.** The adversary emits the three tests. Commit them.
+5. **Dispatch.** Push, then send the agent your repo and the **commit SHA**. It
    works against exactly that tree and cannot see anything you commit
    afterwards.
-5. **Build in parallel.** You take `score.py`. The agent takes `diff.py`,
+6. **Build in parallel.** You take `score.py`. The agent takes `usage.py`,
    streaming its full trajectory to your terminal and pushing a commit after
    every iteration.
-6. **Integrate.** Merge `agent/diff` and run the integration test.
-7. **Inspect the trajectory.** What it read, wrote, and retried — and what that
+7. **Integrate.** Merge `agent/parse` and run the integration test.
+8. **Inspect the trajectory.** What it read, wrote, and retried — and what that
    tells you about trusting it.
 
-Step 6 is the point of the workshop. It fits because the contract was precise,
+Step 7 is the point of the workshop. It fits because the contract was precise,
 not because anyone coordinated. Watching the agent work cannot change your half:
 your target is `test_score_contract.py`, and it does not move.
 
@@ -113,7 +135,7 @@ curl -X POST "https://$REGION-aiplatform.googleapis.com/v1/$ENGINE:streamQuery" 
   -H "Authorization: Bearer $(gcloud auth print-access-token)" \
   -d '{"class_method":"dispatch",
        "input":{"repo":"git@github.com:you/fork.git",
-                "sha":"a1b2c3d","branch":"agent/diff"}}'
+                "sha":"a1b2c3d","branch":"agent/parse"}}'
 ```
 
 Nothing on the public internet can reach that resource, so there is no inbound
@@ -138,11 +160,11 @@ created with the `gh` credentials the student already has:
 
 ```bash
 ssh-keygen -t ed25519 -f agent_key -N ""
-gh repo deploy-key add agent_key.pub --allow-write --title "risk-scorer-agent"
+gh repo deploy-key add agent_key.pub --allow-write --title "health-scorer-agent"
 ```
 
-Terraform writes it into Secret Manager and wires it to the agent. Blast radius
-is one repository by construction.
+The key goes into Secret Manager and is wired to the agent. Blast radius is one
+repository by construction.
 
 ## Skills
 
@@ -164,8 +186,8 @@ One rule decides which repo a thing belongs in: **do students fork it?**
 
 | Repo | Students | Contents |
 | --- | --- | --- |
-| `workshop-agentic-sdlc` | Clone and install from. Never fork | This README, classroom outline, `preflight.sh`, `skills/` |
-| `workshop-agentic-sdlc-lab` | Fork on the day | The risk scorer app, the spec, `tutorial.md` |
+| `workshop-agentic-sdlc` | Clone and install from. Never fork | This README, classroom outline, `preflight.sh`, `terraform/`, `skills/` |
+| `workshop-agentic-sdlc-lab` | Fork on the day | The app, `docs/spec.md`, `docs/request.md`, `tutorial.md` |
 
 The lab repo opens at kickoff. The rubric and the walkthrough are where the
 lab's discoveries live, and a student who read them last week does not get to
@@ -175,21 +197,32 @@ make them.
 
 You need a GCP project with billing enabled and a GitHub account.
 
-Clone this repo and run `./preflight.sh` **a week before the session**. It
-checks authentication, billing, required APIs, org policy, quota, and `gh`
-login, printing the exact command to fix anything missing. It also installs the
-`spec-adversary` plugin and verifies it loads.
+Clone this repo and run `./preflight.sh` **a week before the session**. It:
 
-Both of the lab's day-of blockers retire here: enabling APIs costs 10-15
+- checks authentication, billing, required APIs, org policy, quota, and `gh` login
+- prints the exact command to fix anything missing
+- installs the `spec-adversary` plugin and verifies it loads
+- runs `terraform apply` for the static infrastructure: service account, IAM,
+  and an empty Secret Manager secret
+
+The split is by what a step touches. **Anything touching only your GCP project
+runs a week early. Anything touching your fork must wait**, because the fork
+does not exist yet. Day-of steps address resources by deterministic name rather
+than Terraform outputs, so it does not matter where or when preflight ran.
+
+Both of the lab's day-of blockers retire here: enabling APIs costs 10–15
 minutes the lab does not have, and a failed plugin install sits directly
 upstream of the tool that produces the contract.
 
 ## On the day
 
 ```bash
-gh auth login                      # device code
+gh auth login                                                  # device code
 gh repo fork OWNER/workshop-agentic-sdlc-lab --clone --remote
 ```
+
+Then `agents-cli` scaffolds the agent, you deploy it, and the deploy key is
+created and written into the secret.
 
 ## Open questions
 
@@ -201,5 +234,6 @@ gh repo fork OWNER/workshop-agentic-sdlc-lab --clone --remote
   90-minute slot.
 - **Agent Runtime's maximum invocation duration.** If it is shorter than a
   red-to-green loop, dispatch changes from streaming to submit-and-poll.
+- **Region.** Agent Platform, the model, Sessions, and Memory Bank must agree,
+  and `global` versus regional endpoints is a documented trap.
 - **Cloud Shell sizing** for the CLI. Cloud Workstations is the upgrade path.
-- **How much Terraform students run** versus what preflight settles in advance.
