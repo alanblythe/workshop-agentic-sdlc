@@ -26,11 +26,20 @@ variable "model_location" {
   description = <<-EOT
     Which endpoint serves the model. gemini-3.6-flash is served only from
     global. Sourced from $MODEL_LOCATION.
+
+    Nothing here is provisioned from this value. It is taken so that the two
+    locations are checked against each other in one place, before an attendee
+    spends a deploy discovering they disagree.
   EOT
 
   validation {
     condition     = var.model_location == "global" || can(regex("^[a-z]+-[a-z]+[0-9]$", var.model_location))
     error_message = "model_location must be 'global' or a region. The whole Gemini 3 family answers only from 'global'; a regional endpoint returns a 404 that names the model and reads as a typo."
+  }
+
+  validation {
+    condition     = var.model_location != var.agent_engine_location
+    error_message = "model_location and agent_engine_location are both '${var.model_location}'. They are independent: the model answers from an endpoint and the engine runs in a region. The workshop pins a Gemini 3 model, served only from 'global', so matching them to look tidy returns a 404 that names the model."
   }
 }
 
