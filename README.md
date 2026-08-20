@@ -270,9 +270,6 @@ A skill is only its `name` and `description` until something activates it; the
 body is loaded on demand. The description is what earns the invocation, so it
 is written to be matched, not to be read.
 
-See [`docs/verification/lab-01-antigravity-cli.md`](docs/verification/lab-01-antigravity-cli.md)
-for the verified CLI contract.
-
 ## Repos
 
 One rule decides which repo a thing belongs in: **do students fork it?**

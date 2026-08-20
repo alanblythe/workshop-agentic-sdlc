@@ -5,7 +5,7 @@
 A throwaway tutorial used to establish what the Cloud Shell side panel renders,
 and how its format differs from the CLaaT codelab the lab guide is written in.
 
-It is not the lab. See `docs/verification/lab-03-claat.md` for what it settled.
+It is not the lab.
 
 ## Headings become steps
 
