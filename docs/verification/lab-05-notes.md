@@ -237,16 +237,37 @@ wrong.
 some attendees and on a laptop for others. `required_version` is `>= 1.9.0`,
 for cross-variable validation.
 
+## Agent Runtime stages nothing in the project
+
+`agents-cli deploy -d agent_runtime` sends the source archive **inline in the
+API request** — `agentplatform/_genai/agent_engines.py` sets
+`spec.source_code_spec.inline_source.source_archive` — and the build and image
+stay in Google-managed storage. `agentic-sdlc-ws1` has a deployed engine and
+**no GCS buckets and no Artifact Registry repositories**, and the live engine's
+spec reads `sourceCodeSpec: {inlineSource: {}, imageSpec: {}}` with no package
+URI anywhere in it.
+
+The staging bucket belongs to the other path in the same SDK.
+`agentplatform.agent_engines.create()` pickles the agent object, requires
+`staging_bucket` from `agentplatform.init()`, refuses a value that does not
+start with `gs://`, and uploads to `staging_bucket/gcs_dir_name`. That is the
+classic Reasoning Engine flow and the workshop does not use it.
+
+So the custom service account needs no storage role: there is nothing in the
+project for it to read. `storage.googleapis.com` stays in the API list because
+it is enabled by default on new projects anyway, so removing it changes
+nothing.
+
+The same read confirms a claim the design rests on. The deployed engine reports
+`effectiveIdentity: service-<NUM>@gcp-sa-aiplatform-re.iam.gserviceaccount.com`
+— a deploy without `--service-account` really does run as `-re`, which is what
+makes `--service-account` a requirement on lab step 3 rather than a preference.
+
 ## Unverified, for the same rehearsal run
 
-Two assumptions in the design above are untested and fail the same way — a 403
-at dispatch on the day:
+One assumption in the design above is untested, and it fails as a 403 at
+dispatch on the day:
 
-- **Nothing grants the custom service account access to the deploy staging
-  bucket.** `storage.googleapis.com` is enabled, but no bucket and no storage
-  role appear anywhere in `terraform/`. If Agent Runtime pulls the packaged
-  agent from GCS as the custom service account rather than as `-re`, that read
-  is unauthorized.
 - **Which principal resolves `--secrets` is not established.** The
   `secretAccessor` grant is on the custom service account, which is right only
   if the secret is read at run time by the runtime identity. If it is resolved
