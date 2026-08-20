@@ -32,8 +32,8 @@ standalone tour.
 
 ## Lab
 
-90 minutes, in Cloud Shell Editor. One link clones the repo, opens the editor,
-and renders the lab steps in a side pane.
+90 minutes, in Cloud Shell Editor. One link forks `workshop-agentic-sdlc-lab`,
+opens the editor on it, and renders `tutorial.md` in a side pane.
 
 ### The app
 
@@ -148,29 +148,47 @@ is one repository by construction.
 
 Two distribution mechanisms, because they are two different conversations:
 
-- **`spec-adversary`** is installed from
-  [`workshop-agentic-sdlc-skills`](https://github.com/OWNER/workshop-agentic-sdlc-skills),
-  a repo students install from and never fork. That is the governance story: a
-  platform team publishes a vetted standard.
+- **`spec-adversary`** is installed from this repo, which students install from
+  and never fork. That is the governance story: a platform team publishes a
+  vetted standard.
 - **`check-my-half`** the student writes themselves in about five minutes. That
   is the authoring story: ten lines of markdown, no approval, no release.
 
-`docs/fallback/spec-adversary.md` is a complete copy parked outside the skill
-discovery path. It never enters context, and it is one copy command away if the
-plugin install fails.
+The skill source lives here in `skills/`. If the plugin install fails, the file
+is already on disk in a repo they cloned a week ago — one copy command, and
+nothing sat in the lab repo's discovery path in the meantime.
 
-## Setup
+## Repos
+
+One rule decides which repo a thing belongs in: **do students fork it?**
+
+| Repo | Students | Contents |
+| --- | --- | --- |
+| `workshop-agentic-sdlc` | Clone and install from. Never fork | This README, classroom outline, `preflight.sh`, `skills/` |
+| `workshop-agentic-sdlc-lab` | Fork on the day | The risk scorer app, the spec, `tutorial.md` |
+
+The lab repo opens at kickoff. The rubric and the walkthrough are where the
+lab's discoveries live, and a student who read them last week does not get to
+make them.
+
+## Before the workshop
 
 You need a GCP project with billing enabled and a GitHub account.
 
-Run `./preflight.sh` **a week before the session**. It checks authentication,
-billing, required APIs, org policy, quota, and `gh` login, and prints the exact
-command to fix anything missing. Enabling APIs on the day costs 10–15 minutes
-that the lab does not have.
+Clone this repo and run `./preflight.sh` **a week before the session**. It
+checks authentication, billing, required APIs, org policy, quota, and `gh`
+login, printing the exact command to fix anything missing. It also installs the
+`spec-adversary` plugin and verifies it loads.
+
+Both of the lab's day-of blockers retire here: enabling APIs costs 10-15
+minutes the lab does not have, and a failed plugin install sits directly
+upstream of the tool that produces the contract.
+
+## On the day
 
 ```bash
-gh auth login            # device code
-gh repo fork --remote    # origin becomes your fork
+gh auth login                      # device code
+gh repo fork OWNER/workshop-agentic-sdlc-lab --clone --remote
 ```
 
 ## Open questions
