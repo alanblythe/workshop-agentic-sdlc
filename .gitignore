@@ -4,3 +4,7 @@ charter.md
 
 # OS / editor cruft
 .DS_Store
+
+# Local account selection; machine-specific
+.envrc
+.direnv/
