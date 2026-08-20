@@ -107,29 +107,40 @@ to /usr/bin, the lab needs this step every time rather than once.
 
 ## Authenticate agy
 
-<walkthrough-tutorial-duration duration="2"></walkthrough-tutorial-duration>
+<walkthrough-tutorial-duration duration="3"></walkthrough-tutorial-duration>
 
 **`agy` has its own login, separate from `gcloud`.** Authenticating gcloud and
-ADC does nothing for `agy` — it holds its own OAuth grant, with its own scopes
+ADC does nothing for `agy` — it holds its own OAuth grant with its own scopes
 (`cloud-platform`, `aicode`, `cclog`, `experimentsandconfigs`). Two logins, not
-one.
+one. There is no `agy login` subcommand; authentication happens on first use.
 
-There is no `agy login` subcommand. Authentication happens on first use, and
-**the prompt waits only 60 seconds** — so read this step before running it.
+**Maximise the terminal panel first.** The login prints a very long URL, and a
+narrow terminal wraps it across six or more lines, which makes it painful to
+select cleanly. A wide terminal wraps it less.
 
-When you run the command below it prints a URL and waits. Open the URL, approve,
-and it will show you a code. Paste that code back into the terminal and press
-Enter. The browser does not need to be on the same machine: the redirect goes to
-a hosted callback, not a localhost listener, which is why this works in Cloud
-Shell at all.
+> aside negative
+> Use plain `agy`, not `agy -p`. Print mode caps the wait at 60 seconds and
+> then fails with `authentication interrupted`. The interactive prompt has no
+> timeout — it waits at an input field for as long as you need.
 
 ```bash
-agy -p "Reply with exactly: ok"
+agy
 ```
 
-If it times out, nothing is broken — run it again with the browser already open.
+You will get a prompt reading *"Open the URL below in your browser"*, then
+*"After authenticating, copy the code displayed in the browser and paste it
+below"*, with an `authorization code...` field.
 
-Confirm it took:
+The URL is emitted as a terminal hyperlink, so **try clicking it first** —
+that avoids selecting the wrapped text at all. If clicking does nothing,
+select the whole URL across its wrapped lines and copy it.
+
+Approve in the browser, copy the code it shows, paste it into the field, and
+press Enter. The browser need not be on this machine: the redirect goes to a
+hosted callback rather than a localhost listener, which is what makes this work
+in Cloud Shell.
+
+Then leave the session with `/quit` and confirm the grant took:
 
 ```bash
 agy -p "Reply with exactly: authenticated"
@@ -137,8 +148,8 @@ agy -p "Reply with exactly: authenticated"
 
 <walkthrough-footnote>
 Answering without a URL prompt means the grant is in place. It lives under
-~/.gemini, so in an ephemeral session it dies with the session and has to be
-repeated; in a persistent one it survives.
+~/.gemini, so an ephemeral session loses it when the session ends and a
+persistent one keeps it.
 </walkthrough-footnote>
 
 ## Probe agy on Linux
