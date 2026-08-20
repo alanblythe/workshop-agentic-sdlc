@@ -459,6 +459,15 @@ browser crash, or just to re-read a step — gets a *fresh* clone and the editor
 opens **that** one. Their work is in the previous directory. Nothing warns
 them, and the two look identical.
 
+Reproduced deliberately: a second click on the same link produced
+`workshop-agentic-sdlc-0`, and the editor opened that one — correctly rooted
+by `cloudshell_workspace=.`, just at the wrong copy.
+
+**The tutorial also asks for a project again on resume.** Re-opening shows a
+banner — *"To resume your tutorial, please select a project"* — so panel
+progress is tied to a selected project and does not carry over on its own.
+Another reason the guide cannot treat the picker as a one-time formality.
+
 The guide must therefore:
 
 - Say the link is for the **start** of the lab, and that returning to it later
