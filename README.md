@@ -313,9 +313,15 @@ to fail, because it reaches npm *and* GitHub before the fork is ever involved.
 
 ### `preflight.sh`
 
-Clone this repo and run `./preflight.sh` **before the session**. It:
+The attendee-facing instructions are the **setup codelab**, `setup.lab.md`,
+which is published before the session and works on a laptop as well as in
+Cloud Shell. This section is the design behind it, not a second copy of it.
 
-- checks authentication, billing, required APIs, org policy, quota, and `gh` login
+Clone this repo and run `bash scripts/preflight.sh` **before the session**. It:
+
+- checks authentication, **billing before anything else** (its absence surfaces
+  later as `403 BILLING_DISABLED` from a call that never mentions billing),
+  required APIs, and `gh` login
 - prints the exact command to fix anything missing
 - verifies `agy`, `uv`, and `npx` are present, and names the install command for
   any that are not
@@ -326,15 +332,28 @@ Clone this repo and run `./preflight.sh` **before the session**. It:
 - validates `AGENT_ENGINE_LOCATION` and `MODEL_LOCATION` by **making a real call
   to `gemini-3.6-flash`**, not by reading the model catalog. A catalog entry
   describes the model, not your access to it
-- creates the `aiplatform` service identity, then runs `terraform apply` for the
-  static infrastructure: service account, IAM, and an empty Secret Manager secret
+- exports `GOOGLE_APPLICATION_CREDENTIALS`, because Terraform ignores
+  `CLOUDSDK_CONFIG` and would otherwise run as a different account than every
+  `gcloud` call beside it
+- runs `terraform apply` for the static infrastructure: the required APIs, an
+  empty Secret Manager secret, and one IAM binding granting the agent's
+  federated principal read access to it
 
-Service agents are created lazily — they do not exist until their API is first
-used, so `gcloud beta services identity create` must run before Terraform binds
-anything, or grants fail with `INVALID_ARGUMENT: ... does not exist`. The
-runtime principal is `gcp-sa-aiplatform-re`, which is not the same as
-`gcp-sa-aiplatform`. Never mask a grant with `|| true`: a masked failure
-resurfaces as an unexplainable 403 during deployment.
+It does **not** check org policy or quota. Neither is cheaply readable by an
+attendee, and preflight claims only what it actually verifies: the secret's
+user-managed replication is what a resource-location policy would block, so the
+apply is that test.
+
+The deployed agent runs under **Agent Identity** rather than a service account,
+so nothing here creates one and no grant names a service agent. Its principal is
+federated, and the secret is granted to the set covering every Agent Runtime
+agent in the project — a member with no engine id in it, which is what lets the
+grant precede the engine by a week.
+
+Never mask a grant with `|| true`, and never guess a principal. Both produce the
+same failure: a binding that is accepted, grants nothing, and surfaces as an
+unexplainable 403 during the lab. Terraform refuses rather than guessing when it
+cannot derive the trust domain.
 
 The split is by what a step touches. **Anything touching only your GCP project
 runs a week early. Anything touching your fork must wait**, because the fork
