@@ -292,3 +292,44 @@ be an *Open in Cloud Shell* button — it has to be "open Cloud Shell, then
   Cloud Shell. Decides the shape of codelab step 2.
 - GitHub Pages hosting — deliberately not attempted; blocked on the repo
   decision.
+
+## Open in Cloud Shell is unusable for this lab
+
+![The Open in Cloud Shell dialog for a non-Google repo](../images/cloud-shell-ephemeral-warning.png)
+
+Confirmed live against `github.com/octocat/Hello-World`. The dialog appears
+before anything runs:
+
+> This repo is not officially maintained by Google and is considered untrusted
+> by default.
+>
+> **This session will run in Ephemeral mode and all files will be deleted on
+> session end.**
+
+The same URL against a Google-owned repo
+(`GoogleCloudPlatform/python-docs-samples`) says only *"This repo is officially
+maintained by Google."* — no ephemeral warning and no checkbox. So the
+behaviour is governed by the Google-ownership allow list, not by the URL form.
+
+**The `Trust repo` checkbox is optional and does not gate the clone** —
+`Confirm` proceeds with it unticked. What ticking it changes was not tested.
+Note the dialog states the ephemeral behaviour flatly, not as a consequence of
+leaving the box unticked, so nothing here suggests it is an opt-out. Either
+way the button cannot be relied on: a lab step whose environment depends on an
+attendee noticing an unexplained checkbox is not a lab step.
+
+An attendee's fork is never Google-owned, so the button would hand them a
+scratch `$HOME` deleted at session end, with no credentials. The lab installs
+`agy` (169 MB) and authenticates — both would be discarded.
+
+**Decision: do not ship an Open in Cloud Shell button.** Cloud Shell itself is
+unaffected and remains the workstation; only the `cloudshell_git_repo` link is
+withdrawn. Step 2 of the guide sends the attendee to plain Cloud Shell and has
+them clone:
+
+```
+https://shell.cloud.google.com/
+git clone https://github.com/OWNER/REPO && cd REPO
+```
+
+That keeps the default, persistent, credentialed environment.
