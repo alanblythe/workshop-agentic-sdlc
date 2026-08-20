@@ -371,8 +371,8 @@ CommonMark plus `<walkthrough-*>` directives; the codelab is CLaaT. Shipping
 both means two sources of truth for the same twelve steps unless one is
 generated from the other.
 
-One caveat worth testing before relying on the panel: the project picker lists
-the user's projects, but that list comes from the Console UI using the browser
-session, **not** from the VM's gcloud — which has no credentials. So
-`<walkthrough-project-setup>` may appear to succeed while the shell still
-cannot call anything until `gcloud auth login` has run.
+`<walkthrough-project-setup>` works in an ephemeral session — confirmed by
+running it. The picker lists the user's projects and selecting one takes
+effect, even though the VM itself starts with no credentials. It does not
+substitute for `gcloud auth login --update-adc`, which is still what gives the
+shell and ADC something to authenticate with.
