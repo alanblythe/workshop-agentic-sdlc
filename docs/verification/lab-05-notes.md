@@ -123,6 +123,35 @@ whole ordering problem disappears into one line. If it does not, take the
 
 Run it against a scratch project — not `ws2`.
 
+## State is local, so teardown does not go through Terraform
+
+`.gitignore` excludes `terraform/*.tfstate`, and preflight runs in the
+attendee's clone up to a week before the session. Clicking the Open in Cloud
+Shell button again does not update that clone — it makes
+`workshop-agentic-sdlc-0`, `-1`, and opens the new one. The realistic day-of
+position is therefore **a fresh clone with empty state, against a project where
+all 21 resources already exist**, and empty state is indistinguishable from a
+project preflight never touched:
+
+- `terraform apply` fails with `409 already exists` on the service account and
+  on the secret.
+- `terraform destroy` reports "no changes", removes nothing, and leaves the
+  service account and secret behind while exiting 0.
+
+The second is worse than the first, because it is a silent success. Two
+decisions follow:
+
+- **LAB-19 tears down with `gcloud`, not `terraform destroy`.** Both resource
+  names are fixed strings, so a teardown that deletes them by name needs no
+  state and is correct in any clone. This is the whole reason the names are
+  constants rather than variables. A remote GCS backend was rejected: it would
+  make teardown state-correct but reintroduces a bootstrap problem — a bucket
+  that has to exist before the thing that creates buckets runs.
+- **LAB-04 makes `apply` idempotent by importing.** Before planning, preflight
+  probes for the service account and the secret by their fixed names and
+  `terraform import`s each one that exists but is absent from state. A second
+  preflight run in a second clone then converges instead of colliding.
+
 ## Consequences for other issues
 
 - **LAB-04 (`preflight.sh`)** — the `gcloud beta services identity create` step
@@ -133,8 +162,9 @@ Run it against a scratch project — not `ws2`.
 - **LAB-12 / LAB-15 (step 3)** — the deploy command must carry
   `--service-account`. Without it the lab breaks at dispatch, with a 403 reading
   the secret.
-- **LAB-19 (teardown)** — `terraform destroy` removes the service account, its
-  bindings and the secret. APIs stay enabled (`disable_on_destroy = false`): an
+- **LAB-19 (teardown)** — deletes the service account and the secret by their
+  fixed names with `gcloud`, for the state reason above. Its bindings go with
+  the service account. APIs stay enabled (`disable_on_destroy = false`): an
   attendee's project may have been using them before the workshop.
 
 ## Deliberately not built
