@@ -63,6 +63,48 @@ Open README.md
 A footnote renders in a muted style at the bottom of the step.
 </walkthrough-footnote>
 
+## Get agy onto the latest version
+
+<walkthrough-tutorial-duration duration="2"></walkthrough-tutorial-duration>
+
+The image ships `agy` at `/usr/bin/agy`, and the version varies by session —
+1.1.9 and 1.1.13 have both been seen, against 1.1.16 from the macOS cask. The
+lab should not run on whatever the image happens to carry.
+
+Record what you start with:
+
+```bash
+agy --version && command -v agy
+```
+
+Now update. `agy` has its own updater:
+
+```bash
+agy update
+```
+
+If that fails on permissions, `/usr/bin` needs root — Cloud Shell grants
+passwordless sudo:
+
+```bash
+sudo agy update
+```
+
+Check what you ended up with, and **where**:
+
+```bash
+agy --version
+command -v agy
+ls -la ~/.local/bin/agy 2>/dev/null || echo "not in ~/.local/bin"
+```
+
+<walkthrough-footnote>
+Where it lands is the thing to watch. Cloud Shell persists only $HOME — the
+rest of the VM is rebuilt — so an update written into /usr/bin is gone next
+session, while one written under ~/.local/bin survives. If the updater writes
+to /usr/bin, the lab needs this step every time rather than once.
+</walkthrough-footnote>
+
 ## Probe agy on Linux
 
 <walkthrough-tutorial-duration duration="3"></walkthrough-tutorial-duration>
