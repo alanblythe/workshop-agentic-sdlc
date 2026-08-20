@@ -15,9 +15,51 @@ Locations chosen for the workshop:
 allowlist risk in an attendee's own project — the deciding factor. It is served
 only from `global`, which is what fixes `MODEL_LOCATION`.
 
+## Projects
+
+Argolis org `ablythe.altostrat.com` (`1085975473437`), billing
+`014BB1-D8854B-6BF307`.
+
+| Project | Number | Role |
+|---|---|---|
+| `agentic-sdlc-ws1` | 622097863668 | Build and iterate |
+| `agentic-sdlc-ws2` | 99705347531 | Rehearsal — kept pristine |
+
+`ws2` has billing linked and **no APIs enabled**. That is deliberate: the
+rehearsal (LAB-19/20) exists to prove a *fresh* project works, and a project
+already warmed by the build cannot demonstrate that. Do not enable anything in
+`ws2` outside a rehearsal run.
+
+`ws1` has `aiplatform`, `run`, `cloudbuild`, `storage`, `secretmanager`,
+`iam`, and `iamcredentials` enabled. LAB-05 owns the canonical list; this set
+is what LAB-02 needed.
+
+The repo pins the project through a gitignored `.envrc`
+(`CLOUDSDK_CORE_PROJECT`) rather than `gcloud config set`, because the
+altostrat profile's active project is shared with the luncher repo.
+`AGENT_ENGINE_LOCATION` and `MODEL_LOCATION` are deliberately **not** exported
+there — preflight must refuse when they are unset, and exporting them locally
+would hide a regression in that check.
+
+### The two AI Platform service agents are not the same principal
+
+```
+gcloud beta services identity create --service=aiplatform.googleapis.com
+  -> service-622097863668@gcp-sa-aiplatform.iam.gserviceaccount.com
+```
+
+That creates **`gcp-sa-aiplatform`**. The Agent Runtime principal is
+**`gcp-sa-aiplatform-re`** — a different service agent, still lazily created.
+A Terraform grant to the `-re` principal on a fresh project can therefore fail
+with `INVALID_ARGUMENT: ... does not exist` even after this command has run.
+Never mask that grant with `|| true`; it will silently produce an agent that
+deploys and then cannot do its job.
+
 ## Model availability — `global` is required, not preferred
 
-Measured 2026-08-20 with `generateContent`, project `geap-3a-token-sec`:
+Measured 2026-08-20 with `generateContent`. Confirmed identically in the
+workshop project `agentic-sdlc-ws1` and in `geap-3a-token-sec`, so the pattern
+is a property of model serving, not of one project's allowlist:
 
 | Model | `global` | `us-central1` |
 |---|---|---|
