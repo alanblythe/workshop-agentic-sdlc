@@ -349,6 +349,37 @@ The remaining unknown is **`agy` on Linux**. LAB-01 established
 `brew install --cask antigravity-cli` on macOS arm64; Cloud Shell is Linux with
 no Homebrew, and neither the install path nor its duration has been measured.
 
+### Ephemeral is not deterministic, and the workspace must be pinned
+
+Two behaviours observed on the **same URL**, and both matter for a lab.
+
+**The same link produced an ephemeral session once and a persistent one the
+next time.** The second attempt ran in the attendee's real Cloud Shell — real
+`$HOME`, real credentials, no `EPHEMERAL` badge and no warning dialog. The
+likely cause is session state: `cloudshell_open` appears to clone into an
+already-running persistent session rather than starting an ephemeral one, so
+the outcome depends on whether the user had Cloud Shell open. Not confirmed.
+
+**This is the problem, not ephemeral mode itself.** A lab step whose
+environment differs depending on whether the attendee happened to have a tab
+open is a step that behaves differently for different people in the same room,
+with no signal to either them or the presenter. The guide cannot say "you have
+no credentials" or "you have credentials" — it has to work either way, which
+means `gcloud auth login --update-adc` must be written as an unconditional
+step rather than a conditional one.
+
+**Pin the workspace.** Without `cloudshell_workspace`, the editor opens at
+`$HOME` — exposing the user's dotfiles and their other projects — and the repo
+is merely cloned into `~/cloudshell_open/`. Add `&cloudshell_workspace=.` to
+root both editor and terminal at the cloned repository:
+
+```
+https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=<REPO>&cloudshell_workspace=.&cloudshell_tutorial=tutorial.md
+```
+
+In a persistent session the clone also **stays** in `~/cloudshell_open/` after
+the lab, so the guide should say what it left behind.
+
 ### The tutorial panel works
 
 ![The Cloud Shell tutorial panel rendering beside the terminal](../images/cloud-shell-tutorial-panel.jpg)
