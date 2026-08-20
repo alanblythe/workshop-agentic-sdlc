@@ -339,9 +339,11 @@ rather than plain `login`, because ADC is what `agents-cli` and the ADK read.
 Node and npx are preinstalled (`v24.18.1` / `12.0.2`), and `/home` has 53 GB
 free, so nothing else is needed and disk is not a constraint.
 
-**Decision: keep the Open in Cloud Shell button.** A toolchain that reinstalls
-in ~36s does not need to survive between sessions, which removes the only real
-objection. Preflight keeps its week-early value on the GCP side — enabling APIs
+**Decision: keep the Open in Cloud Shell button.** Two independent reasons,
+either of which would be enough. A trusted repo opens in the persistent,
+credentialed environment, so the ephemeral case is avoidable entirely. And
+even when it is not avoided, a toolchain that reinstalls in ~36s does not need
+to survive between sessions. Preflight keeps its week-early value on the GCP side — enabling APIs
 costs 10–15 minutes, and quota, org policy and Terraform all persist in the
 project. The toolchain install moves into the lab's first step.
 
@@ -357,15 +359,23 @@ Two behaviours observed on the **same URL**, and both matter for a lab.
 next time.** The second attempt ran in the attendee's real Cloud Shell — real
 `$HOME`, real credentials, no `EPHEMERAL` badge and no warning dialog.
 
-**Leading hypothesis: `Trust repo` is remembered per repository.** Ticking it
-once appears to move that repo into the default, persistent, credentialed
-environment for subsequent opens. That would make the checkbox meaningful
-rather than decorative, and would mean the button *can* deliver a persistent
-environment — at the cost of a one-time trust decision by the attendee.
+**`Trust repo` is what changes it, and it is remembered.** Confirmed: ticking
+the checkbox marks the repo trusted, and subsequent opens run in the normal
+persistent environment with the attendee's credentials and their real `$HOME`.
 
-Not yet confirmed. The test: open a **different** non-Google repo that has
-never been trusted. If that one still shows the ephemeral dialog while this
-repo now opens persistently, trust is per-repo and remembered.
+So the button *can* deliver a persistent environment — for the price of one
+trust decision, made once, by the attendee.
+
+**But it does not gate the clone.** `Confirm` proceeds with the box unticked,
+which is exactly how someone ends up in an ephemeral session without noticing.
+The guide must therefore ask for it explicitly *and* not depend on it having
+happened:
+
+- Name the trust step and say why it matters.
+- Write `gcloud auth login --update-adc` **unconditionally**. Nobody can tell
+  which environment they are in from inside it; running it when already
+  authenticated is harmless, skipping it when not is fatal.
+- Say that a trusted clone persists in `~/cloudshell_open/` afterwards.
 
 **This is the problem, not ephemeral mode itself.** A lab step whose
 environment differs depending on whether the attendee happened to have a tab
