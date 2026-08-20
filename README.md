@@ -89,10 +89,11 @@ The longhand `MonthSnapshot` list in your test is the seam, written out by hand.
 
 1. **File the request.** `gh issue create -F docs/request.md`. Work starts where
    work starts.
-2. **Draft the spec** from it.
+2. **Read the draft spec.** It ships in the lab repo and reads as a competent
+   first pass. It is not.
 3. **Harden it.** The spec adversary hunts for places two independent
-   implementers could reasonably disagree, and makes you resolve each one. An
-   empty usage figure — is that zero, or unknown?
+   implementers could reasonably disagree, and makes you resolve each one. The
+   adversary finds them; you decide them. Deciding is the transferable skill.
 4. **Take the contract.** The adversary emits the three tests. Commit them.
 5. **Dispatch.** Push, then send the agent your repo and the **commit SHA**. It
    works against exactly that tree and cannot see anything you commit
@@ -103,9 +104,15 @@ The longhand `MonthSnapshot` list in your test is the seam, written out by hand.
 7. **Integrate.** Merge `agent/parse` and run the integration test.
 8. **Inspect the trajectory.** What it read, wrote, and retried — and what that
    tells you about trusting it.
+9. **Eval the adversary.** The draft spec is a golden case: you know what a good
+   adversary finds in it, because you just resolved it by hand. One case, one
+   command, and an answer to "how would you know if this agent got worse?"
 
 Step 7 is the point of the workshop. It fits because the contract was precise,
-not because anyone coordinated. Watching the agent work cannot change your half:
+not because anyone coordinated. Students who resolve an ambiguity differently
+still succeed: the adversary encodes *their* decision into *their* contract, and
+the agent codes against that. The lab does not require the right answer. It
+requires an answer, written down before work starts. Watching the agent work cannot change your half:
 your target is `test_score_contract.py`, and it does not move.
 
 ## Architecture
@@ -140,6 +147,26 @@ curl -X POST "https://$REGION-aiplatform.googleapis.com/v1/$ENGINE:streamQuery" 
 
 Nothing on the public internet can reach that resource, so there is no inbound
 webhook.
+
+### Region
+
+"Location" is three values, and they are not interchangeable.
+
+| Value | Names | The lab pins |
+| --- | --- | --- |
+| Model location | Which endpoint serves the model | `MODEL_LOCATION`, often `global` |
+| Engine location | Where the engine runs, and where Sessions live | `AGENT_ENGINE_LOCATION`, a real region |
+| Deploy region | Where the deploy lands | `AGENT_ENGINE_LOCATION` |
+
+`global` is a model endpoint, not a region. Some model versions are served only
+from it and a regional endpoint returns **404** for them, which reads as a bad
+model name rather than a bad location. Interpolated into a regional host it
+yields `global-aiplatform.googleapis.com`, which does not resolve.
+
+**Neither variable has a default.** A guessed region builds a URL that resolves
+and points somewhere else — the agent is reachable and its sessions come back
+empty, with nothing indicating why. Preflight refuses to continue if either is
+unset.
 
 ### Agent runtime
 
@@ -202,8 +229,17 @@ Clone this repo and run `./preflight.sh` **a week before the session**. It:
 - checks authentication, billing, required APIs, org policy, quota, and `gh` login
 - prints the exact command to fix anything missing
 - installs the `spec-adversary` plugin and verifies it loads
-- runs `terraform apply` for the static infrastructure: service account, IAM,
-  and an empty Secret Manager secret
+- validates `AGENT_ENGINE_LOCATION` and `MODEL_LOCATION` against quota, model
+  availability, and org policy
+- creates the `aiplatform` service identity, then runs `terraform apply` for the
+  static infrastructure: service account, IAM, and an empty Secret Manager secret
+
+Service agents are created lazily — they do not exist until their API is first
+used, so `gcloud beta services identity create` must run before Terraform binds
+anything, or grants fail with `INVALID_ARGUMENT: ... does not exist`. The
+runtime principal is `gcp-sa-aiplatform-re`, which is not the same as
+`gcp-sa-aiplatform`. Never mask a grant with `|| true`: a masked failure
+resurfaces as an unexplainable 403 during deployment.
 
 The split is by what a step touches. **Anything touching only your GCP project
 runs a week early. Anything touching your fork must wait**, because the fork
@@ -234,6 +270,4 @@ created and written into the secret.
   90-minute slot.
 - **Agent Runtime's maximum invocation duration.** If it is shorter than a
   red-to-green loop, dispatch changes from streaming to submit-and-poll.
-- **Region.** Agent Platform, the model, Sessions, and Memory Bank must agree,
-  and `global` versus regional endpoints is a documented trap.
 - **Cloud Shell sizing** for the CLI. Cloud Workstations is the upgrade path.
