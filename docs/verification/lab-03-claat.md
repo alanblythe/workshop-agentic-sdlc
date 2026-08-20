@@ -439,6 +439,36 @@ Shell**, and the lab needs no install step for it.
 Rehearsing locally does not tell you how attendees' `agy` behaves, so anything
 LAB-06 depends on must be checked against 1.1.9.
 
+### Re-clicking the button clones again, numbered
+
+`cloudshell_open` runs with `--force_new_clone`. It does **not** update an
+existing clone — it creates a numbered sibling:
+
+```
+~/cloudshell_open/
+  Hello-World
+  Hello-World-0        <- second click
+  workshop-agentic-sdlc
+```
+
+In a persistent session these accumulate in the attendee's real `$HOME` and
+stay there after the lab.
+
+**The trap:** an attendee who re-opens the codelab link mid-lab — after a
+browser crash, or just to re-read a step — gets a *fresh* clone and the editor
+opens **that** one. Their work is in the previous directory. Nothing warns
+them, and the two look identical.
+
+The guide must therefore:
+
+- Say the link is for the **start** of the lab, and that returning to it later
+  means going to the existing directory instead.
+- Print the working directory in an early step, so the attendee has seen the
+  path they should be in: `pwd`.
+- Never assume a clone is current. A pre-existing clone is whatever revision it
+  was cloned at, so any step depending on newer content needs an explicit
+  `git pull --ff-only`.
+
 ### Ephemeral is a session state, with a one-click exit
 
 The session badge menu states it plainly:
