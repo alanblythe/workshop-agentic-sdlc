@@ -183,6 +183,29 @@ decisions follow:
   attendee's project a week early, and its identity is not what the design
   binds against.
 
+## Terraform does not read `CLOUDSDK_CONFIG`
+
+`gcloud` honours it; Terraform does not. The provider resolves Application
+Default Credentials through the Go auth library, which looks at
+`GOOGLE_APPLICATION_CREDENTIALS` and then at the hardcoded path
+`~/.config/gcloud/application_default_credentials.json`. A `CLOUDSDK_CONFIG`
+pointing at a second configuration is ignored, so Terraform runs as whichever
+account owns the default ADC file while every `gcloud` command beside it runs
+as the intended one.
+
+It does not present as an identity error. It presents as:
+
+```
+Error: the user does not have permission to access Project "PROJECT" or it may
+not exist
+  with data.google_project.this
+```
+
+which reads as a wrong project id or a missing API, and sends you to look at
+the project instead of at the credentials. `preflight.sh` must export
+`GOOGLE_APPLICATION_CREDENTIALS` explicitly, or select the account it wants as
+the default ADC.
+
 ## Validation performed
 
 `terraform fmt`, `terraform init -backend=false`, `terraform validate` — clean.
