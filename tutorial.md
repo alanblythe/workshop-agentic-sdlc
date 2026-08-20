@@ -33,6 +33,22 @@ Pick a project, which the real guide would need before anything touches GCP:
 
 <walkthrough-project-setup></walkthrough-project-setup>
 
+The picker only sets a **tutorial variable**. It does not touch the shell, so
+a step has to apply it — this is the part a guide is easy to ship without:
+
+```bash
+export GOOGLE_CLOUD_PROJECT="<walkthrough-project-id/>"
+gcloud config set project "$GOOGLE_CLOUD_PROJECT"
+gcloud config get-value project
+```
+
+In an ephemeral session the shell also starts with no credentials, so this is
+needed before anything can call an API:
+
+```bash
+gcloud auth login --update-adc
+```
+
 ## Directives the codelab format has no answer for
 
 <walkthrough-tutorial-duration duration="1"></walkthrough-tutorial-duration>
