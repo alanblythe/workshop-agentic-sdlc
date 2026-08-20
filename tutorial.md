@@ -1,40 +1,28 @@
-# Cloud Shell tutorial format probe
+# Set up your project, before the workshop
 
-<walkthrough-tutorial-duration duration="3"></walkthrough-tutorial-duration>
+This prepares **your own Google Cloud project** for the session. It runs a
+week early on purpose, so nothing here competes with the lab for time.
 
-A throwaway tutorial used to establish what the Cloud Shell side panel renders,
-and how its format differs from the CLaaT codelab the lab guide is written in.
+Nothing you do here is reported anywhere. The output is for you.
 
-It is not the lab.
+By the end you will have: a project with the right APIs on, an empty Secret
+Manager secret waiting for a deploy key, the `agy` CLI updated and logged in,
+and the `spec-adversary` plugin installed.
 
-## Headings become steps
+**You do not fork this repository.** You clone it, you run preflight from it,
+and on the day you fork a *different* one — `workshop-agentic-sdlc-lab`.
 
-<walkthrough-tutorial-duration duration="1"></walkthrough-tutorial-duration>
+## Pick your project
 
-A level-1 heading is the title, a level-2 heading is a **step**, and a level-3
-heading is an item inside it. The panel shows one step at a time with Next and
-Back, which is the structural difference from a codelab page.
+<walkthrough-tutorial-duration duration="2"></walkthrough-tutorial-duration>
 
-### An item inside the step
-
-Items do not get their own panel; they render inline.
-
-## Code blocks and the project picker
-
-<walkthrough-tutorial-duration duration="1"></walkthrough-tutorial-duration>
-
-A fenced block gets a copy-to-terminal control:
-
-```bash
-echo "the panel can push this straight into the shell"
-```
-
-Pick a project, which the real guide would need before anything touches GCP:
+Use a project you are happy to create billed resources in. The lab deploys an
+agent, which costs money while it runs, and the last step of the workshop
+tears it down again.
 
 <walkthrough-project-setup></walkthrough-project-setup>
 
-The picker only sets a **tutorial variable**. It does not touch the shell, so
-a step has to apply it — this is the part a guide is easy to ship without:
+The picker sets a tutorial variable, not your shell. Apply it:
 
 ```bash
 export GOOGLE_CLOUD_PROJECT="<walkthrough-project-id/>"
@@ -42,164 +30,154 @@ gcloud config set project "$GOOGLE_CLOUD_PROJECT"
 gcloud config get-value project
 ```
 
-In an ephemeral session the shell also starts with no credentials, so this is
-needed before anything can call an API:
+**Billing must be linked to this project.** Preflight checks it early, because
+without it the Agent Platform APIs fail with `403 BILLING_DISABLED` from a call
+that never mentions billing.
+
+## Authenticate
+
+<walkthrough-tutorial-duration duration="2"></walkthrough-tutorial-duration>
+
+A fresh Cloud Shell session starts with no credentials. You need **two** grants
+here, not one — the second is what Terraform uses:
 
 ```bash
 gcloud auth login --update-adc
 ```
 
-## Directives the codelab format has no answer for
+`--update-adc` is the part that matters. Application Default Credentials are a
+separate file from your `gcloud` login, and Terraform reads only the former.
 
-<walkthrough-tutorial-duration duration="1"></walkthrough-tutorial-duration>
-
-Open a file directly in the editor:
-
-<walkthrough-editor-open-file filePath="README.md">
-Open README.md
-</walkthrough-editor-open-file>
-
-<walkthrough-footnote>
-A footnote renders in a muted style at the bottom of the step.
-</walkthrough-footnote>
-
-## Get agy onto the latest version
+## Choose your two locations
 
 <walkthrough-tutorial-duration duration="2"></walkthrough-tutorial-duration>
 
-The image ships `agy` at `/usr/bin/agy`, and the version varies by session —
-1.1.9 and 1.1.13 have both been seen. The lab runs on the current release
-instead, so everyone is on the same one.
+Two settings, and they are **not** the same value:
 
-> aside negative
-> This is a **every-session** step. `agy update` replaces the binary in
-> `/usr/bin`, which is on the VM rather than the persistent disk, so it is
-> discarded whenever Cloud Shell recycles. If you reconnect later, run it
-> again — and if anything misbehaves afterwards, check `agy --version` first.
-
-Record what you start with:
+| Variable | Value | What it controls |
+| --- | --- | --- |
+| `MODEL_LOCATION` | `global` | Where the model answers from |
+| `AGENT_ENGINE_LOCATION` | `us-central1` | Where your agent runs |
 
 ```bash
-agy --version && command -v agy
+export MODEL_LOCATION=global
+export AGENT_ENGINE_LOCATION=us-central1
 ```
 
-Now update. It needs `sudo`: the binary lives in `/usr/bin`, which the
-unprivileged updater refuses with
-`directory /usr/bin is not fully accessible (readable: true, writable: false)`.
-Cloud Shell grants passwordless sudo.
+**Setting both to the same thing is the mistake to avoid.** The workshop uses
+`gemini-3.6-flash`, and the whole Gemini 3 family is served *only* from
+`global` — a regional endpoint returns a 404 that names the model and reads
+like a typo. Preflight refuses to continue if the two match, or if either is
+unset. There are deliberately no defaults: a guessed region builds a URL that
+resolves and quietly points somewhere else.
+
+Add both to `~/.bashrc` if you want them to survive a new session.
+
+## Update agy
+
+<walkthrough-tutorial-duration duration="2"></walkthrough-tutorial-duration>
+
+Cloud Shell ships `agy` at `/usr/bin/agy`, and the version varies by session —
+1.1.9 and 1.1.13 have both been seen minutes apart. The workshop runs on the
+current release so everyone is on the same one.
+
+**This is an every-session step.** `agy update` replaces the binary in
+`/usr/bin`, which lives on the VM rather than the persistent disk, so it is
+discarded whenever Cloud Shell recycles. If you reconnect later, run it again —
+and if anything misbehaves afterwards, check `agy --version` first.
+
+It needs `sudo`, because the unprivileged updater refuses with
+`directory /usr/bin is not fully accessible`. Cloud Shell grants passwordless
+sudo. It takes about 20 seconds, and the download happens on the Cloud Shell
+VM rather than over your own connection.
 
 ```bash
-sudo agy update
+sudo agy update && agy --version
 ```
-
-Check what you ended up with, and **where**:
-
-```bash
-agy --version
-command -v agy
-ls -la ~/.local/bin/agy 2>/dev/null || echo "not in ~/.local/bin"
-```
-
-<walkthrough-footnote>
-Where it lands is the thing to watch. Cloud Shell persists only $HOME — the
-rest of the VM is rebuilt — so an update written into /usr/bin is gone next
-session, while one written under ~/.local/bin survives. If the updater writes
-to /usr/bin, the lab needs this step every time rather than once.
-</walkthrough-footnote>
 
 ## Authenticate agy
 
 <walkthrough-tutorial-duration duration="3"></walkthrough-tutorial-duration>
 
-**`agy` has its own login, separate from `gcloud`.** Authenticating gcloud and
-ADC does nothing for `agy` — it holds its own OAuth grant with its own scopes
-(`cloud-platform`, `aicode`, `cclog`, `experimentsandconfigs`). Two logins, not
-one. There is no `agy login` subcommand; authentication happens on first use.
+**`agy` has its own login, separate from `gcloud`.** Authenticating gcloud does
+nothing for it — it holds its own OAuth grant with its own scopes. Two logins,
+not one. There is no `agy login` subcommand; authentication happens on first
+use.
 
 **Maximise the terminal panel first.** The login prints a very long URL, and a
-narrow terminal wraps it across six or more lines, which makes it painful to
-select cleanly. A wide terminal wraps it less.
+narrow terminal wraps it across six or more lines, which is painful to select.
 
-> aside negative
-> Use plain `agy`, not `agy -p`. Print mode caps the wait at 60 seconds and
-> then fails with `authentication interrupted`. The interactive prompt has no
-> timeout — it waits at an input field for as long as you need.
+Use plain `agy`, **not** `agy -p`. Print mode caps the wait at 60 seconds and
+then fails with `authentication interrupted`. The interactive prompt has no
+timeout — it waits at an input field for as long as you need.
 
 ```bash
 agy
 ```
 
-You will get a prompt reading *"Open the URL below in your browser"*, then
-*"After authenticating, copy the code displayed in the browser and paste it
-below"*, with an `authorization code...` field.
+You will be asked to open a URL, then to paste back a code. The URL is emitted
+as a terminal hyperlink, so **try clicking it first**. Approve in the browser,
+copy the code, paste it into the `authorization code...` field, press Enter,
+then leave with `/quit`.
 
-The URL is emitted as a terminal hyperlink, so **try clicking it first** —
-that avoids selecting the wrapped text at all. If clicking does nothing,
-select the whole URL across its wrapped lines and copy it.
+The browser need not be on this machine: the redirect goes to a hosted
+callback rather than a localhost listener, which is what makes this work in
+Cloud Shell at all.
 
-Approve in the browser, copy the code it shows, paste it into the field, and
-press Enter. The browser need not be on this machine: the redirect goes to a
-hosted callback rather than a localhost listener, which is what makes this work
-in Cloud Shell.
-
-Then leave the session with `/quit` and confirm the grant took:
+Confirm the grant took:
 
 ```bash
 agy -p "Reply with exactly: authenticated"
 ```
 
 <walkthrough-footnote>
-Answering without a URL prompt means the grant is in place. It lives under
-~/.gemini, so an ephemeral session loses it when the session ends and a
-persistent one keeps it.
+Answering without a URL prompt means the grant is in place. Unlike the binary,
+it lives under ~/.gemini and does survive a session recycle.
 </walkthrough-footnote>
 
-## Probe agy on Linux
+## Run preflight
 
-<walkthrough-tutorial-duration duration="3"></walkthrough-tutorial-duration>
+<walkthrough-tutorial-duration duration="4"></walkthrough-tutorial-duration>
 
-LAB-01 measured the `agy` install on macOS only. Cloud Shell is Linux, so the
-install path, footprint and whether it survives a new session are all unknown
-— and Cloud Shell is where attendees actually run.
+This checks everything above, then provisions the project.
 
-First get the latest of this repo, since the probe script is new:
+Look first if you like — it changes nothing with `--plan-only`:
 
 ```bash
-git pull --ff-only
+bash scripts/preflight.sh --plan-only
 ```
 
-Confirm `agy` is on the path here:
+Then run it for real:
 
 ```bash
-command -v agy && agy --version
+bash scripts/preflight.sh
 ```
 
-If that prints nothing, `agy` is not installed in this session — say so
-rather than installing it blind, because *how* it gets installed is one of
-the things being measured.
+It checks your tools, that npm and github are reachable, that billing is
+linked, that the APIs are on, and that `gemini-3.6-flash` really answers for
+you — with an actual call, because a catalog entry describes the model rather
+than your access to it. Then it applies the Terraform.
 
-Now run the probe. It is read-only apart from one plugin install that it
-removes again, and every call is capped so an unauthenticated `agy` cannot
-hang the terminal:
-
-```bash
-bash scripts/probe-agy.sh 2>&1 | tee /tmp/agy-probe.txt
-```
-
-Then hand back the output:
-
-```bash
-cat /tmp/agy-probe.txt
-```
+**Failures do not stop it.** Every problem it finds is listed at the end with
+the exact command that fixes it, so you get the whole list in one run. Fix
+them and run it again — it is safe to re-run.
 
 <walkthrough-footnote>
-The probe answers: install path and owner, binary size, whether PATH survives
-a new shell, where config lands, whether the plugin surface works
-unauthenticated, the shape of the auth prompt, and memory at rest.
+If you are on a corporate network, the checks most likely to fail are npm and
+github reachability. Those are needed before any Google Cloud resource is
+involved, because the ADK skills install through npx.
 </walkthrough-footnote>
 
-## Done
+## You are ready
 
 <walkthrough-conclusion-trophy></walkthrough-conclusion-trophy>
 
-If you are reading this in a panel beside a terminal, the mechanism works.
+Preflight created an **empty** secret named `agentic-sdlc-deploy-key`. It stays
+empty until the day — the key goes into it during the lab, generated against
+the repository you will fork then.
+
+Nothing is running yet, so nothing is costing you anything. The agent gets
+deployed during the session, and the final step of the lab tears it down.
+
+If you had to fix anything, re-run `bash scripts/preflight.sh` until it
+reports **ready**. Bring that result to the session.
