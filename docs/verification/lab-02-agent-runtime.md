@@ -113,10 +113,65 @@ consult the catalog — only a real call settles it.
 Prior art: `~/repos/ensemblr/docs/reference/README.md` records the same lesson
 after a preview-model 404 broke a staging deploy.
 
-## Outstanding — needs the workshop project
+## Deploy and runtime
 
-- Maximum invocation duration for `:streamQuery` (**the blocker**; if shorter
-  than a red-to-green loop, LAB-13 becomes submit-and-poll)
-- Cold deploy wall-clock, to size lab step 3's background window
-- Whether `/tmp` is tmpfs and counts against the memory limit
+| Measure | Value |
+|---|---|
+| Cold deploy, `agents-cli deploy` | **7m13s** |
+| Create an engine sourceless, to mint an identity | ~20s |
+
+Lab step 3 must treat a deploy as a background task with something else filling
+the time. It is not a step anyone can watch.
+
+Deploy defaults: memory `4Gi`, CPU `1`, min instances `1`, max `10`, container
+concurrency `8`.
+
+The deploy is also what creates the `gcp-sa-aiplatform-re` service agent —
+`service-622097863668@gcp-sa-aiplatform-re.iam.gserviceaccount.com` appeared
+only after it completed.
+
+### The container
+
+From inside a running engine:
+
+- Root is **`overlay`**, `upperdir=/tmp/fs/0/upper`. There is no separate
+  `/tmp` mount.
+- **`/tmp` is sized to the memory limit** — exactly 4096 MiB at `--memory 4Gi`.
+  Scratch files compete with the process for the memory budget.
+- `/dev/shm` is a real `tmpfs`.
+
+## Outstanding
+
+### Maximum invocation duration — the blocker, still unmeasured
+
+Work exceeding roughly 600s returned `503` while shorter work returned `200`,
+but **every reading so far is untrustworthy** and the figure must not be
+designed around yet.
+
+The instrument was wrong. `probe_sleep` used a blocking `time.sleep()`, which
+stalls the async event loop, so `container_concurrency: 8` bought nothing and
+five parallel probes wedged the single instance. Killing the clients did not
+cancel the server-side work. A subsequent one-word request returned `HTTP 000`
+after 180s, which is how the saturation was caught: the timings were measuring
+that queue, not the platform.
+
+Two questions remain open, and they have different consequences:
+
+1. **Is the ceiling a cap on total invocation, or an idle timeout?**
+   `:streamQuery` streams NDJSON, and a single silent tool call emits nothing
+   for its whole duration — indistinguishable from a dead connection. A real
+   red-to-green loop is chatty, so if the ceiling is idle-based it may never be
+   reached in practice.
+2. **Does `curl -o file` even measure the right thing?** It times connection
+   close, not answer arrival.
+
+The tool is now `async` (`await asyncio.sleep`). The test that settles it: on a
+fresh instance, have the agent call a short tool repeatedly so events land
+every ~60s across a total well past 600s. Surviving that means idle-based and
+LAB-13 stands as designed; dying at ~600s with events flowing means a hard cap
+and LAB-13 becomes submit-and-poll.
+
+### Also outstanding
+
 - Whether the runtime reaches `github.com` over SSH for the agent's push
+  (`probe_github` is deployed but has not been run)
