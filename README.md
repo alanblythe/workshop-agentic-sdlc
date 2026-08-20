@@ -3,9 +3,12 @@
 **The spec is the interface between humans and agents. Its precision is what
 makes parallel work possible.**
 
-A workshop for sales engineers on the evolution of agentic engineering and how
-to apply it on GCP and the Gemini Enterprise Agent Platform. Half classroom,
-half hands-on lab.
+A 90-minute customer session on the evolution of agentic engineering and how to
+apply it on GCP and the Gemini Enterprise Agent Platform. Delivered by a sales
+engineer to a customer's developers. Half classroom, half hands-on lab.
+
+Attendees work in **their own GCP projects and their own GitHub accounts**. The
+point is that it worked here, in their org, under their policies.
 
 Most agent demos are serial: you ask, the agent answers, you review. This
 workshop is about the next step — a developer and an agent building two halves
@@ -220,11 +223,11 @@ The lab repo opens at kickoff. The rubric and the walkthrough are where the
 lab's discoveries live, and a student who read them last week does not get to
 make them.
 
-## Before the workshop
+## Before the session
 
-You need a GCP project with billing enabled and a GitHub account.
+Attendees need a GCP project with billing enabled and a GitHub account.
 
-Clone this repo and run `./preflight.sh` **a week before the session**. It:
+Clone this repo and run `./preflight.sh` **before the session**. It:
 
 - checks authentication, billing, required APIs, org policy, quota, and `gh` login
 - prints the exact command to fix anything missing
@@ -250,6 +253,9 @@ Both of the lab's day-of blockers retire here: enabling APIs costs 10–15
 minutes the lab does not have, and a failed plugin install sits directly
 upstream of the tool that produces the contract.
 
+`preflight.sh` is re-runnable and reports nothing anywhere. Its output is for
+the attendee, and a nudge from the session sponsor is what moves completion.
+
 ## On the day
 
 ```bash
@@ -260,6 +266,20 @@ gh repo fork OWNER/workshop-agentic-sdlc-lab --clone --remote
 Then `agents-cli` scaffolds the agent, you deploy it, and the deploy key is
 created and written into the secret.
 
+## Pacing
+
+The lab has one hard gate: **dispatch**. The agent needs wall-clock time to
+work, so an attendee who has not dispatched by the stated minute cannot reach
+step 7 at all. Everything else can slip.
+
+The lab repo carries checkpoint branches for anyone behind:
+
+```bash
+git merge upstream/checkpoint/4-contract-committed
+```
+
+Fast finishers run the eval, then hunt a second seeded ambiguity.
+
 ## Open questions
 
 - **`antigravity` is unverified.** The one dependency not yet installed and
@@ -267,7 +287,10 @@ created and written into the secret.
   will not work in Cloud Shell, a device code will), whether it has a plugin
   model and what `install` accepts, and its memory footprint.
 - **Timing.** The lab as specified is ~89 minutes of frictionless content in a
-  90-minute slot.
+  90-minute slot that a customer has committed to. There is no slack, and the
+  customer has a next meeting.
+- **Reachability.** The fork, the deploy key, and the agent's push all assume
+  `github.com`. An enterprise network that blocks it takes the lab to zero.
 - **Agent Runtime's maximum invocation duration.** If it is shorter than a
   red-to-green loop, dispatch changes from streaming to submit-and-poll.
 - **Cloud Shell sizing** for the CLI. Cloud Workstations is the upgrade path.
