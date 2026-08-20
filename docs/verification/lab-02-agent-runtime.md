@@ -142,34 +142,40 @@ From inside a running engine:
 
 ## Outstanding
 
-### Maximum invocation duration — the blocker, still unmeasured
+### Maximum invocation duration — 600s, a hard cap
 
-Work exceeding roughly 600s returned `503` while shorter work returned `200`,
-but **every reading so far is untrustworthy** and the figure must not be
-designed around yet.
+**`:streamQuery` is capped at ~600 seconds of total invocation.** Measured
+cleanly on a freshly deployed instance with a non-blocking tool:
 
-The instrument was wrong. `probe_sleep` used a blocking `time.sleep()`, which
-stalls the async event loop, so `container_concurrency: 8` bought nothing and
-five parallel probes wedged the single instance. Killing the clients did not
-cancel the server-side work. A subsequent one-word request returned `HTTP 000`
-after 180s, which is how the saturation was caught: the timings were measuring
-that queue, not the platform.
+```
+[t+  188.7s gap  1.3s] TEXT   progress 3 of 12
+[t+  373.3s gap  1.3s] TEXT   progress 6 of 12
+[t+  557.9s gap  1.3s] TEXT   progress 9 of 12
+[t+  600.3s] {"error":{"code":503,"message":"The service is currently
+              unavailable.","status":"UNAVAILABLE"}}
+== stream closed after 600.3s ==
+```
 
-Two questions remain open, and they have different consequences:
+**It is not an idle timeout.** The agent was emitting a progress update every
+~60s and was mid-job at 9 of 12 when the platform injected a `503 UNAVAILABLE`
+into the stream and closed it. Keeping the connection busy does not extend it,
+so there is nothing a chatty agent — or a client-side keepalive — can do. The
+cap is on elapsed invocation, full stop.
 
-1. **Is the ceiling a cap on total invocation, or an idle timeout?**
-   `:streamQuery` streams NDJSON, and a single silent tool call emits nothing
-   for its whole duration — indistinguishable from a dead connection. A real
-   red-to-green loop is chatty, so if the ceiling is idle-based it may never be
-   reached in practice.
-2. **Does `curl -o file` even measure the right thing?** It times connection
-   close, not answer arrival.
+The earlier confounded runs had reported the same ~601s boundary. That agreement
+was luck: those numbers were measuring a queue. This one is the measurement.
 
-The tool is now `async` (`await asyncio.sleep`). The test that settles it: on a
-fresh instance, have the agent call a short tool repeatedly so events land
-every ~60s across a total well past 600s. Surviving that means idle-based and
-LAB-13 stands as designed; dying at ~600s with events flowing means a hard cap
-and LAB-13 becomes submit-and-poll.
+#### Consequence: LAB-13 becomes submit-and-poll
+
+A red-to-green loop that might exceed ten minutes cannot be one streamed
+invocation. Either the dispatched work fits inside 600s with margin, or the
+lab's dispatch is submit-and-poll. Since the coder agent runs unsupervised
+while the attendee works, and its deadline was already meant to derive from the
+invocation timeout, **600s is that deadline** — and it is tight enough that the
+agent must be told about it explicitly rather than discovering it as a 503.
+
+The health baseline for comparison: a one-word request on the same instance
+returns in **7s**.
 
 ### Also outstanding
 
