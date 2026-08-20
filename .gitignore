@@ -8,3 +8,9 @@ charter.md
 # Local account selection; machine-specific
 .envrc
 .direnv/
+
+# Terraform working state; preflight leaves it in the attendee's clone
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.tfvars
