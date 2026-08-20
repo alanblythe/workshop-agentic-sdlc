@@ -1,6 +1,6 @@
-# Informational, for preflight to echo back. Every value here is also derivable
+# Informational, for preflight to echo back. The two names are also derivable
 # from the naming convention, because day-of steps run in a different clone and
-# cannot read this state.
+# cannot read this state. Nothing on the day may consume these.
 
 output "agent_service_account_email" {
   description = "Pass this to `agents-cli deploy --service-account`."

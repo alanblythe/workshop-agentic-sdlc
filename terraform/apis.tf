@@ -1,7 +1,3 @@
-data "google_project" "this" {
-  project_id = var.project_id
-}
-
 resource "google_project_service" "required" {
   for_each = toset(local.required_services)
 

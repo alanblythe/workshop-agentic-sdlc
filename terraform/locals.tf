@@ -1,3 +1,7 @@
+data "google_project" "this" {
+  project_id = var.project_id
+}
+
 locals {
   # Fixed strings, not variables. Day-of lab steps address these resources by
   # name in a different clone of a different repo, possibly a week later.
