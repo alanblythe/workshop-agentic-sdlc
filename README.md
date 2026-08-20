@@ -3,9 +3,10 @@
 **The spec is the interface between humans and agents. Its precision is what
 makes parallel work possible.**
 
-A 90-minute customer session on the evolution of agentic engineering and how to
-apply it on GCP and the Gemini Enterprise Agent Platform. Delivered by a sales
-engineer to a customer's developers. Half classroom, half hands-on lab.
+A three-hour customer session on the evolution of agentic engineering and how
+to apply it on GCP and the Gemini Enterprise Agent Platform. Delivered by a
+customer engineer to a customer's developers: 90 minutes classroom, 90 minutes
+hands-on lab.
 
 Attendees work in **their own GCP projects and their own GitHub accounts**. The
 point is that it worked here, in their org, under their policies.
@@ -35,8 +36,16 @@ standalone tour.
 
 ## Lab
 
-90 minutes, in Cloud Shell Editor. One link forks `workshop-agentic-sdlc-lab`,
-opens the editor on it, and renders `tutorial.md` in a side pane.
+90 minutes. The guide is a codelab; the work happens in Cloud Shell Editor,
+launched from an **Open in Cloud Shell** button inside it.
+
+`lab.lab.md` is authored in DevSite CLaaT format and rendered with `claat
+export` to GitHub Pages, so it looks like any other Google codelab — step
+drawer, progress bar, `Duration:` tags summed in the navbar. Publishing it to
+`codelabs.developers.google.com` later is moving one file.
+
+The `Duration:` tags are not decoration. They are what holds the 90 minutes
+together, and the sum is visible to the attendee throughout.
 
 ### The app
 
@@ -107,7 +116,9 @@ The longhand `MonthSnapshot` list in your test is the seam, written out by hand.
 7. **Integrate.** Merge `agent/parse` and run the integration test.
 8. **Inspect the trajectory.** What it read, wrote, and retried — and what that
    tells you about trusting it.
-9. **Eval the adversary.** The draft spec is a golden case: you know what a good
+9. **Tear down.** Delete the deployed agent, the service account, and the
+   secret. Attendees are in their own billed projects, so this is not optional.
+10. **Eval the adversary.** The draft spec is a golden case: you know what a good
    adversary finds in it, because you just resolved it by hand. One case, one
    command, and an answer to "how would you know if this agent got worse?"
 
@@ -217,7 +228,7 @@ One rule decides which repo a thing belongs in: **do students fork it?**
 | Repo | Students | Contents |
 | --- | --- | --- |
 | `workshop-agentic-sdlc` | Clone and install from. Never fork | This README, classroom outline, `preflight.sh`, `terraform/`, `skills/` |
-| `workshop-agentic-sdlc-lab` | Fork on the day | The app, `docs/spec.md`, `docs/request.md`, `tutorial.md` |
+| `workshop-agentic-sdlc-lab` | Fork on the day | The app, `docs/spec.md`, `docs/request.md`, `lab.lab.md`, the generated codelab on Pages |
 
 The lab repo opens at kickoff. The rubric and the walkthrough are where the
 lab's discoveries live, and a student who read them last week does not get to
@@ -286,9 +297,10 @@ Fast finishers run the eval, then hunt a second seeded ambiguity.
   exercised. Three things to check first: its auth flow (a localhost redirect
   will not work in Cloud Shell, a device code will), whether it has a plugin
   model and what `install` accepts, and its memory footprint.
-- **Timing.** The lab as specified is ~89 minutes of frictionless content in a
-  90-minute slot that a customer has committed to. There is no slack, and the
-  customer has a next meeting.
+- **Timing.** The lab is ~73 minutes of content in a 90-minute half. That slack
+  is the only slack, and the customer has a next meeting.
+- **`claat`.** Verify the export invocation and that the generated output serves
+  correctly from Pages before building the guide around it.
 - **Reachability.** The fork, the deploy key, and the agent's push all assume
   `github.com`. An enterprise network that blocks it takes the lab to zero.
 - **Agent Runtime's maximum invocation duration.** If it is shorter than a
