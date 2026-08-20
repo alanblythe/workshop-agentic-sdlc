@@ -209,15 +209,47 @@ the default ADC.
 ## Validation performed
 
 `terraform fmt`, `terraform init -backend=false`, `terraform validate` — clean.
-No `apply`, and no project touched. The three refusals were exercised with a
-plan against a nonexistent project and an invalid token:
+
+**`terraform plan` against `agentic-sdlc-ws2`, the pristine project: `21 to
+add, 0 to change, 0 to destroy`.** Plan is read-only — it issues GETs, enables
+nothing, and writes no state, so ws2 remains pristine. This settles a bootstrap
+question worth recording: `data.google_project` reads successfully even though
+`cloudresourcemanager.googleapis.com` is **not** among the 22 APIs a new
+project has enabled by default. The configuration does not need a pre-enabled
+API to plan.
+
+The refusals are all variable validations, so they fire locally, before any
+credential is resolved or any API is called:
 
 | Input | Result |
 |---|---|
 | No variables set | `No value for required variable` ×4 |
 | `agent_engine_location=global` | Rejected: `global` is a model endpoint, not a region |
-| `model_location == agent_engine_location` | Precondition failed: the two are independent |
+| `model_location == agent_engine_location` | Rejected, naming both values, at `variables.tf` |
+
+`model_location` provisions nothing. It is taken so that the two locations can
+be checked against each other in one place; the check lives on the variable
+rather than on a resource so that it reports against the input the attendee got
+wrong.
 
 `.terraform.lock.hcl` is locked for `linux_amd64`, `linux_arm64`,
 `darwin_amd64` and `darwin_arm64`, because preflight runs in Cloud Shell for
-some attendees and on a laptop for others.
+some attendees and on a laptop for others. `required_version` is `>= 1.9.0`,
+for cross-variable validation.
+
+## Unverified, for the same rehearsal run
+
+Two assumptions in the design above are untested and fail the same way — a 403
+at dispatch on the day:
+
+- **Nothing grants the custom service account access to the deploy staging
+  bucket.** `storage.googleapis.com` is enabled, but no bucket and no storage
+  role appear anywhere in `terraform/`. If Agent Runtime pulls the packaged
+  agent from GCS as the custom service account rather than as `-re`, that read
+  is unauthorized.
+- **Which principal resolves `--secrets` is not established.** The
+  `secretAccessor` grant is on the custom service account, which is right only
+  if the secret is read at run time by the runtime identity. If it is resolved
+  at deploy time by `-re` instead, the grant is on the wrong principal and
+  decision (c) loses its justification — the fallback in the rejected-options
+  list above becomes the design.
