@@ -1,0 +1,6 @@
+# Local working notes, not part of the workshop material
+.scratch/
+charter.md
+
+# OS / editor cruft
+.DS_Store
