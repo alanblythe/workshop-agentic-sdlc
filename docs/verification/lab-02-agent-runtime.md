@@ -9,6 +9,11 @@ Locations chosen for the workshop:
 |---|---|
 | `AGENT_ENGINE_LOCATION` | `us-central1` |
 | `MODEL_LOCATION` | `global` |
+| Model | `gemini-3.6-flash` |
+
+`gemini-3.6-flash` is GA (no `-preview` suffix), so it carries no per-project
+allowlist risk in an attendee's own project — the deciding factor. It is served
+only from `global`, which is what fixes `MODEL_LOCATION`.
 
 ## Model availability — `global` is required, not preferred
 

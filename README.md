@@ -187,14 +187,25 @@ webhook.
 
 | Value | Names | The lab pins |
 | --- | --- | --- |
-| Model location | Which endpoint serves the model | `MODEL_LOCATION`, often `global` |
-| Engine location | Where the engine runs, and where Sessions live | `AGENT_ENGINE_LOCATION`, a real region |
+| Model location | Which endpoint serves the model | `MODEL_LOCATION=global` |
+| Engine location | Where the engine runs, and where Sessions live | `AGENT_ENGINE_LOCATION=us-central1` |
 | Deploy region | Where the deploy lands | `AGENT_ENGINE_LOCATION` |
 
-`global` is a model endpoint, not a region. Some model versions are served only
-from it and a regional endpoint returns **404** for them, which reads as a bad
-model name rather than a bad location. Interpolated into a regional host it
-yields `global-aiplatform.googleapis.com`, which does not resolve.
+The model is **`gemini-3.6-flash`**, which is served *only* from `global`. So
+`MODEL_LOCATION=global` is a requirement of the model, not a preference, and it
+stays independent of the engine region. Setting both to `us-central1` — the
+tidy-looking mistake — returns 404.
+
+`global` is a model endpoint, not a region. The whole Gemini 3 family is served
+only from it, and a regional endpoint returns **404** naming the model, which
+reads as a bad model name rather than a bad location. Interpolated into a
+regional host it yields `global-aiplatform.googleapis.com`, which does not
+resolve; the global host is plain `aiplatform.googleapis.com`.
+
+Model IDs use **dots**: `gemini-3.6-flash`. The hyphenated forms in
+documentation URLs are page slugs and 404 the same way a wrong region does.
+`gemini-3.6-flash` carries no `-preview` suffix, which matters because preview
+models are allowlisted per project and attendees run in their own.
 
 **Neither variable has a default.** A guessed region builds a URL that resolves
 and points somewhere else — the agent is reachable and its sessions come back
