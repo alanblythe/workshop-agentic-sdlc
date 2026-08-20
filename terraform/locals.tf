@@ -3,10 +3,9 @@ data "google_project" "this" {
 }
 
 locals {
-  # Fixed strings, not variables. Day-of lab steps address these resources by
-  # name in a different clone of a different repo, possibly a week later.
-  agent_service_account_id = "agentic-sdlc-coder"
-  deploy_key_secret_id     = "agentic-sdlc-deploy-key"
+  # A fixed string, not a variable. Day-of lab steps address this secret by name
+  # in a different clone of a different repo, possibly a week later.
+  deploy_key_secret_id = "agentic-sdlc-deploy-key"
 
   required_services = [
     "aiplatform.googleapis.com",
@@ -15,7 +14,6 @@ locals {
     "cloudresourcemanager.googleapis.com",
     "cloudtrace.googleapis.com",
     "iam.googleapis.com",
-    "iamcredentials.googleapis.com",
     "logging.googleapis.com",
     "monitoring.googleapis.com",
     "run.googleapis.com",
@@ -24,13 +22,23 @@ locals {
     "storage.googleapis.com",
   ]
 
-  agent_project_roles = [
-    "roles/aiplatform.user",
-    "roles/serviceusage.serviceUsageConsumer", # its absence breaks every Google API call, not just the one under test
-    "roles/logging.logWriter",
-    "roles/monitoring.metricWriter",
-    "roles/cloudtrace.agent",
-  ]
+  # The trust domain is the workload identity pool the agent's principal lives
+  # in, and it is named after the project's parent. A project directly under an
+  # organization and one with no organization at all get different pools, and a
+  # project under a folder does not report an org_id here at all — hence the
+  # override, and the precondition in secret.tf that refuses to guess.
+  derived_trust_domain = (
+    data.google_project.this.org_id != "" ?
+    "agents.global.org-${data.google_project.this.org_id}.system.id.goog" :
+    data.google_project.this.folder_id == "" ?
+    "agents.global.project-${data.google_project.this.number}.system.id.goog" :
+    ""
+  )
 
-  runtime_service_agent = "service-${data.google_project.this.number}@gcp-sa-aiplatform-re.iam.gserviceaccount.com"
+  agent_trust_domain = var.agent_trust_domain != "" ? var.agent_trust_domain : local.derived_trust_domain
+
+  # Every Agent Runtime agent in this project, rather than one engine by id.
+  # No engine id appears in it, so the grant can be made before the engine
+  # exists — which is what lets preflight run a week before the session.
+  agent_principal_set = "principalSet://${local.agent_trust_domain}/attribute.platformContainer/aiplatform/projects/${data.google_project.this.number}"
 }

@@ -43,20 +43,17 @@ variable "model_location" {
   }
 }
 
-variable "runtime_service_agent_exists" {
-  type        = bool
+variable "agent_trust_domain" {
+  type        = string
+  default     = ""
   description = <<-EOT
-    Whether service-<PROJECT_NUMBER>@gcp-sa-aiplatform-re.iam.gserviceaccount.com
-    exists yet. It is created by the project's first Agent Runtime deploy, so on
-    a project that has never deployed one the answer is false and the grant that
-    depends on it is deferred to a later apply. Determine it, do not guess:
+    Override for the workload identity pool the agent's principal lives in,
+    such as agents.global.org-1085975473437.system.id.goog.
 
-      gcloud iam service-accounts describe \
-        "service-$(gcloud projects describe PROJECT --format='value(projectNumber)')@gcp-sa-aiplatform-re.iam.gserviceaccount.com"
-
-    Pass false only for a probe that returned NOT_FOUND. Any other failure —
-    no credentials, no permission, a network error — must abort the caller.
-    This value is desired state, not a hint: passing false after the grant
-    exists revokes it, and a working engine then fails at dispatch.
+    Leave empty and it is derived from the project's parent: the org- form for
+    a project directly under an organization, the project- form for one with no
+    organization. A project under a folder reports neither here, and the apply
+    refuses rather than guessing — a binding to the wrong trust domain is
+    accepted and grants nothing, which is worse than a failure.
   EOT
 }
