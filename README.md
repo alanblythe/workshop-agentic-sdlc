@@ -74,10 +74,13 @@ parallel.
 
 ### The seam
 
-| Half | Owner | Contract |
+| Half | Written by | Contract |
 | --- | --- | --- |
-| `usage.py` | Coder agent | `parse_usage(csv) -> list[MonthSnapshot]` |
-| `score.py` | You | `score(list[MonthSnapshot]) -> (score, tier, reasons)` |
+| `usage.py` | The deployed agent, unsupervised | `parse_usage(csv) -> list[MonthSnapshot]` |
+| `score.py` | The local agent, steered by you | `score(list[MonthSnapshot]) -> (score, tier, reasons)` |
+
+Nobody hand-writes Python. Both halves are agent-written; what differs is
+whether anyone is watching.
 
 `MonthSnapshot` is the seam. The spec fixes it, along with the exact weights
 and tier thresholds, so that two parties working independently arrive at code
@@ -89,10 +92,10 @@ Three tests, emitted by the spec adversary and committed before either party
 starts. A contract is testable from both sides independently — that is what
 makes it a contract rather than a wish.
 
-| Test | Run by | Asserts |
+| Test | Verifies | Asserts |
 | --- | --- | --- |
-| `test_parse_contract.py` | The agent, alone | `parse_usage(FIXTURE)` produces exactly this `list[MonthSnapshot]` |
-| `test_score_contract.py` | You, alone | `score(<longhand MonthSnapshot list>)` produces exactly this tier and reasons |
+| `test_parse_contract.py` | The deployed half, alone | `parse_usage(FIXTURE)` produces exactly this `list[MonthSnapshot]` |
+| `test_score_contract.py` | The local half, alone | `score(<longhand MonthSnapshot list>)` produces exactly this tier and reasons |
 | `test_integration.py` | Both, after merge | The two compose |
 
 The longhand `MonthSnapshot` list in your test is the seam, written out by hand.
@@ -103,16 +106,18 @@ The longhand `MonthSnapshot` list in your test is the seam, written out by hand.
    work starts.
 2. **Read the draft spec.** It ships in the lab repo and reads as a competent
    first pass. It is not.
-3. **Harden it.** The spec adversary hunts for places two independent
-   implementers could reasonably disagree, and makes you resolve each one. The
-   adversary finds them; you decide them. Deciding is the transferable skill.
+3. **Harden it, turn by turn.** This is where your hands-on time goes. The spec
+   adversary surfaces one ambiguity at a time and shows you both readings and
+   how they diverge — *empty `seats_active`: zero, so the account collapsed, or
+   unknown, so skip the month?* You choose. It writes your choice into the spec
+   and moves to the next. The adversary finds them; **you** decide them.
 4. **Take the contract.** The adversary emits the three tests. Commit them.
 5. **Dispatch.** Push, then send the agent your repo and the **commit SHA**. It
    works against exactly that tree and cannot see anything you commit
    afterwards.
-6. **Build in parallel.** You take `score.py`. The agent takes `usage.py`,
-   streaming its full trajectory to your terminal and pushing a commit after
-   every iteration.
+6. **Build in parallel.** You steer the local agent through `score.py` while
+   the deployed agent works `usage.py` unwatched, streaming its trajectory and
+   pushing a commit after every iteration.
 7. **Integrate.** Merge `agent/parse` and run the integration test.
 8. **Inspect the trajectory.** What it read, wrote, and retried — and what that
    tells you about trusting it.
@@ -136,8 +141,11 @@ Where a thing runs follows from what it does.
 | Party | Runs | Why there |
 | --- | --- | --- |
 | Spec adversary | Local, Antigravity CLI skill | Interactive, high-iteration, ephemeral. A round trip per turn would ruin it |
-| You | Local | — |
-| Coder agent | Agent Platform | It works *at the same time as you*. Parallelism needs a separate execution context |
+| Local coder | Local, Antigravity CLI | Supervised. You approve each turn, so **you** are the contract |
+| Deployed coder | Agent Platform | Unsupervised, and working at the same time as you. **The test** is the contract |
+
+That contrast is the lab's argument: you can only let an agent work
+unsupervised if something other than you is holding it to the spec.
 
 The coder agent is an ADK agent, scaffolded with `agents-cli`, wrapping the
 Antigravity SDK. Agent Platform is where an agent lives; the SDK is what an
