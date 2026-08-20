@@ -100,39 +100,50 @@ makes it a contract rather than a wish.
 
 The longhand `MonthSnapshot` list in your test is the seam, written out by hand.
 
-### The flow
+### The steps
 
-1. **File the request.** `gh issue create -F docs/request.md`. Work starts where
-   work starts.
-2. **Read the draft spec.** It ships in the lab repo and reads as a competent
-   first pass. It is not.
-3. **Harden it, turn by turn.** This is where your hands-on time goes. The spec
-   adversary surfaces one ambiguity at a time and shows you both readings and
-   how they diverge — *empty `seats_active`: zero, so the account collapsed, or
-   unknown, so skip the month?* You choose. It writes your choice into the spec
-   and moves to the next. The adversary finds them; **you** decide them.
-4. **Take the contract.** The adversary emits the three tests. Commit them.
-5. **Dispatch.** Push, then send the agent your repo and the **commit SHA**. It
-   works against exactly that tree and cannot see anything you commit
-   afterwards.
-6. **Build in parallel.** You steer the local agent through `score.py` while
-   the deployed agent works `usage.py` unwatched, streaming its trajectory and
-   pushing a commit after every iteration.
-7. **Integrate.** Merge `agent/parse` and run the integration test.
-8. **Inspect the trajectory.** What it read, wrote, and retried — and what that
-   tells you about trusting it.
-9. **Tear down.** Delete the deployed agent, the service account, and the
-   secret. Attendees are in their own billed projects, so this is not optional.
-10. **Eval the adversary.** The draft spec is a golden case: you know what a good
-   adversary finds in it, because you just resolved it by hand. One case, one
-   command, and an answer to "how would you know if this agent got worse?"
+`Duration:` tags sum into the codelab's navbar, so the budget is visible to the
+attendee throughout.
 
-Step 7 is the point of the workshop. It fits because the contract was precise,
-not because anyone coordinated. Students who resolve an ambiguity differently
-still succeed: the adversary encodes *their* decision into *their* contract, and
-the agent codes against that. The lab does not require the right answer. It
-requires an answer, written down before work starts. Watching the agent work cannot change your half:
-your target is `test_score_contract.py`, and it does not move.
+| # | Step | Duration |
+| --- | --- | --- |
+| 1 | Before you begin | — |
+| 2 | Fork the lab and connect your agent | 0:08 |
+| 3 | Scaffold the coder agent and start its deploy | 0:05 |
+| 4 | File the request | 0:03 |
+| 5 | **Grill the spec** | 0:15 |
+| 6 | Take the contract | 0:03 |
+| 7 | Dispatch, and watch both agents work | 0:08 |
+| 8 | Integrate and verify | 0:04 |
+| 9 | Teach the adversary a rule of your own | 0:06 |
+| 10 | Eval the adversary | 0:04 |
+| 11 | Clean up | 0:03 |
+| 12 | Congratulations | — |
+| | **Total** | **59 min** |
+
+Fifty-nine minutes of content in the ninety-minute half. The slack is
+deliberate: this runs in a customer's environment, which nobody has tested.
+
+**Step 3 starts the deploy and walks away.** It runs while steps 4–6 happen, and
+step 7 verifies it before dispatching. Waiting for a deploy teaches nothing.
+
+**Step 5 is the lab.** The adversary surfaces one ambiguity at a time and shows
+both readings and how they diverge — *empty `seats_active`: zero, so the account
+collapsed, or unknown, so skip the month?* You choose. It writes your choice
+into the spec and moves on. It finds them; **you** decide them.
+
+**Step 7 is what they came to see.** Two agents building one feature from one
+contract, neither able to see the other. The local one you steer; the deployed
+one nobody does.
+
+**Step 8 is the point.** It fits because the contract was precise, not because
+anyone coordinated. Attendees who resolved an ambiguity differently still
+succeed — the adversary encoded *their* decision into *their* contract, and both
+agents coded against it. The lab does not require the right answer. It requires
+an answer, written down before work starts.
+
+Then the debrief line: *fifteen minutes deciding, five minutes building, and it
+fit first time. Which half did you expect to be the work?*
 
 ## Architecture
 
@@ -222,8 +233,22 @@ Two distribution mechanisms, because they are two different conversations:
 - **`spec-adversary`** is installed from this repo, which students install from
   and never fork. That is the governance story: a platform team publishes a
   vetted standard.
-- **`check-my-half`** the student writes themselves in about five minutes. That
-  is the authoring story: ten lines of markdown, no approval, no release.
+- **`local-spec-rules`** the attendee writes themselves in about five minutes —
+  a rule from their own team's experience, added to the adversary. That is the
+  authoring story: five lines of markdown, no approval, no release.
+
+The published skill declares the seam that makes this deterministic:
+
+```markdown
+## Local rules
+Before reviewing, check for `skills/local-spec-rules.md`.
+If it exists, read it and apply those rules in addition to the standard set.
+```
+
+The attendee's rule fires because the published skill went looking for it, not
+because a model connected two skills on its own. That is also the governance
+pattern in miniature: a published standard with a documented hook, extended
+without forking.
 
 The skill source lives here in `skills/`. If the plugin install fails, the file
 is already on disk in a repo they cloned a week ago — one copy command, and
