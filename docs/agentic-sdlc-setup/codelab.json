@@ -1,0 +1,26 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2026-08-20T18:18:44-04:00",
+  "id": "agentic-sdlc-setup",
+  "duration": 16,
+  "title": "Set up your project before the workshop",
+  "authors": "Alan Blythe",
+  "summary": "Prepare your own Google Cloud project for the Agentic SDLC workshop",
+  "source": "setup.lab.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "cloud",
+    "agents"
+  ],
+  "tags": [
+    "web"
+  ],
+  "feedback": "https://github.com/alanblythe/workshop-agentic-sdlc/issues",
+  "url": "agentic-sdlc-setup"
+}
