@@ -191,8 +191,24 @@ What that costs, and what the design must therefore do:
   have recycled underneath them, silently reverting to the image version. The
   guide should say so, and any later step that misbehaves should have
   `agy --version` as its first diagnostic.
-- **The rehearsal must time it.** Its wall-clock is unmeasured and comes
-  straight out of the 90 minutes.
+- **It costs ~19 seconds.** Measured:
+
+  ```
+  $ time sudo agy update
+  ✓ Found new version 1.1.16.
+  ⟳ Downloading update... ⟳ Extracting files... ✓ Verification successful.
+  ✓ Update successful! Please restart agy.
+  real  0m18.561s
+  ```
+
+  It downloads and extracts a full replacement, but **the download happens
+  VM-side, on Google's network** — not over the attendee's connection. So a
+  room of twenty on shared conference wifi does not multiply this, which was
+  the obvious worry and is not a real one. Negligible against 90 minutes.
+
+- **Order matters: update before using `agy`.** The updater ends with
+  *"Please restart agy"*. Updating after authenticating or mid-task means
+  restarting the CLI, so the update step belongs before the login step.
 - **It requires `sudo`, confirmed.** The unprivileged updater refuses in
   0.377s with a clear error:
 
