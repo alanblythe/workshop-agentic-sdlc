@@ -53,5 +53,10 @@ variable "runtime_service_agent_exists" {
 
       gcloud iam service-accounts describe \
         "service-$(gcloud projects describe PROJECT --format='value(projectNumber)')@gcp-sa-aiplatform-re.iam.gserviceaccount.com"
+
+    Pass false only for a probe that returned NOT_FOUND. Any other failure —
+    no credentials, no permission, a network error — must abort the caller.
+    This value is desired state, not a hint: passing false after the grant
+    exists revokes it, and a working engine then fails at dispatch.
   EOT
 }

@@ -83,6 +83,20 @@ gcloud iam service-accounts describe \
   "service-$(gcloud projects describe "$PROJECT" --format='value(projectNumber)')@gcp-sa-aiplatform-re.iam.gserviceaccount.com"
 ```
 
+### The probe's contract on its caller
+
+The variable reads as an assertion but Terraform treats it as desired state:
+`count` going `1 -> 0` **destroys** the binding. Passing `false` once the grant
+exists revokes impersonation, and the engine that was working starts failing at
+dispatch — after a Terraform run that reported success.
+
+So `false` means exactly one thing: the probe ran and returned `NOT_FOUND`. Any
+other outcome — no credentials, no permission, a network error, an unparsed
+exit code — must abort `preflight.sh` rather than resolve to `false`. A probe
+that cannot answer is not the same as a probe that answered no. This is a
+requirement on LAB-04, not a suggestion, and it is restated in the variable's
+own description.
+
 ## The open risk — this is what the rehearsal must settle
 
 **On a project that has never deployed an engine, the first deploy is the thing
