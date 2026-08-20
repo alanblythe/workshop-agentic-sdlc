@@ -290,13 +290,45 @@ make them.
 
 Attendees need a GCP project with billing enabled and a GitHub account.
 
+### The toolchain
+
+Four things must be on the attendee's path before the lab, and two of them pull
+from the public internet:
+
+| Tool | Installs | Needs |
+| --- | --- | --- |
+| `agy` | `brew install --cask antigravity-cli` | The binary is **`agy`**, not `antigravity` |
+| `uv` | astral installer | Prerequisite of `agents-cli` |
+| Node / `npx` | preinstalled in Cloud Shell | Prerequisite of the skills installer |
+| `agents-cli` + ADK skills | `agents-cli setup` | `uv`, `npx`, github.com, the npm registry |
+
+`agents-cli setup` does double duty: it installs the CLI with
+`uv tool install google-agents-cli`, detects installed coding agents, and
+installs the ADK skills into them with
+`npx -y skills add https://github.com/google/agents-cli -g`. It detects
+Antigravity and links the skills into `~/.gemini/config/skills` and
+`~/.gemini/antigravity-cli/skills`.
+
+Without those skills the attendee has a coding agent that does not know how to
+scaffold, evaluate, or deploy an ADK agent — which is most of the lab. This is
+the single highest-value thing preflight does, and the one with the most ways
+to fail, because it reaches npm *and* GitHub before the fork is ever involved.
+
+### `preflight.sh`
+
 Clone this repo and run `./preflight.sh` **before the session**. It:
 
 - checks authentication, billing, required APIs, org policy, quota, and `gh` login
 - prints the exact command to fix anything missing
-- installs the `spec-adversary` plugin and verifies it loads
-- validates `AGENT_ENGINE_LOCATION` and `MODEL_LOCATION` against quota, model
-  availability, and org policy
+- verifies `agy`, `uv`, and `npx` are present, and names the install command for
+  any that are not
+- runs `agents-cli setup` and verifies the ADK skills landed in Antigravity's
+  skill directory
+- installs the `spec-adversary` plugin and verifies it loads with
+  `agy plugin list`, which works without logging in
+- validates `AGENT_ENGINE_LOCATION` and `MODEL_LOCATION` by **making a real call
+  to `gemini-3.6-flash`**, not by reading the model catalog. A catalog entry
+  describes the model, not your access to it
 - creates the `aiplatform` service identity, then runs `terraform apply` for the
   static infrastructure: service account, IAM, and an empty Secret Manager secret
 
@@ -313,8 +345,10 @@ does not exist yet. Day-of steps address resources by deterministic name rather
 than Terraform outputs, so it does not matter where or when preflight ran.
 
 Both of the lab's day-of blockers retire here: enabling APIs costs 10–15
-minutes the lab does not have, and a failed plugin install sits directly
-upstream of the tool that produces the contract.
+minutes the lab does not have, and a failed skill or plugin install sits
+directly upstream of the tool that produces the contract. A room where
+`agents-cli setup` failed silently is a room with no working agent toolchain,
+discovered at the worst possible moment.
 
 `preflight.sh` is re-runnable and reports nothing anywhere. Its output is for
 the attendee, and a nudge from the session sponsor is what moves completion.
