@@ -105,6 +105,42 @@ session, while one written under ~/.local/bin survives. If the updater writes
 to /usr/bin, the lab needs this step every time rather than once.
 </walkthrough-footnote>
 
+## Authenticate agy
+
+<walkthrough-tutorial-duration duration="2"></walkthrough-tutorial-duration>
+
+**`agy` has its own login, separate from `gcloud`.** Authenticating gcloud and
+ADC does nothing for `agy` — it holds its own OAuth grant, with its own scopes
+(`cloud-platform`, `aicode`, `cclog`, `experimentsandconfigs`). Two logins, not
+one.
+
+There is no `agy login` subcommand. Authentication happens on first use, and
+**the prompt waits only 60 seconds** — so read this step before running it.
+
+When you run the command below it prints a URL and waits. Open the URL, approve,
+and it will show you a code. Paste that code back into the terminal and press
+Enter. The browser does not need to be on the same machine: the redirect goes to
+a hosted callback, not a localhost listener, which is why this works in Cloud
+Shell at all.
+
+```bash
+agy -p "Reply with exactly: ok"
+```
+
+If it times out, nothing is broken — run it again with the browser already open.
+
+Confirm it took:
+
+```bash
+agy -p "Reply with exactly: authenticated"
+```
+
+<walkthrough-footnote>
+Answering without a URL prompt means the grant is in place. It lives under
+~/.gemini, so in an ephemeral session it dies with the session and has to be
+repeated; in a persistent one it survives.
+</walkthrough-footnote>
+
 ## Probe agy on Linux
 
 <walkthrough-tutorial-duration duration="3"></walkthrough-tutorial-duration>
