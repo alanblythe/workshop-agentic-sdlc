@@ -355,10 +355,17 @@ Two behaviours observed on the **same URL**, and both matter for a lab.
 
 **The same link produced an ephemeral session once and a persistent one the
 next time.** The second attempt ran in the attendee's real Cloud Shell — real
-`$HOME`, real credentials, no `EPHEMERAL` badge and no warning dialog. The
-likely cause is session state: `cloudshell_open` appears to clone into an
-already-running persistent session rather than starting an ephemeral one, so
-the outcome depends on whether the user had Cloud Shell open. Not confirmed.
+`$HOME`, real credentials, no `EPHEMERAL` badge and no warning dialog.
+
+**Leading hypothesis: `Trust repo` is remembered per repository.** Ticking it
+once appears to move that repo into the default, persistent, credentialed
+environment for subsequent opens. That would make the checkbox meaningful
+rather than decorative, and would mean the button *can* deliver a persistent
+environment — at the cost of a one-time trust decision by the attendee.
+
+Not yet confirmed. The test: open a **different** non-Google repo that has
+never been trusted. If that one still shows the ephemeral dialog while this
+repo now opens persistently, trust is per-repo and remembered.
 
 **This is the problem, not ephemeral mode itself.** A lab step whose
 environment differs depending on whether the attendee happened to have a tab
