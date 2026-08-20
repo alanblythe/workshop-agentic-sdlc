@@ -83,14 +83,10 @@ Record what you start with:
 agy --version && command -v agy
 ```
 
-Now update. `agy` has its own updater:
-
-```bash
-agy update
-```
-
-If that fails on permissions, `/usr/bin` needs root — Cloud Shell grants
-passwordless sudo:
+Now update. It needs `sudo`: the binary lives in `/usr/bin`, which the
+unprivileged updater refuses with
+`directory /usr/bin is not fully accessible (readable: true, writable: false)`.
+Cloud Shell grants passwordless sudo.
 
 ```bash
 sudo agy update

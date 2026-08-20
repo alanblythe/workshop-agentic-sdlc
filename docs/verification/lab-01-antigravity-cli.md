@@ -171,6 +171,9 @@ which        : /usr/bin/agy
 `$HOME` and rebuilds the rest, so the update is discarded whenever the VM
 recycles. Nothing lands in `~/.local/bin`.
 
+Confirmed by restarting: a session updated to 1.1.16 came back as **1.1.13**.
+The revert is real, not theoretical.
+
 So updating is **an every-session step, not a preflight one**. Preflight cannot
 do it a week early and have it stick.
 
@@ -190,10 +193,17 @@ What that costs, and what the design must therefore do:
   `agy --version` as its first diagnostic.
 - **The rehearsal must time it.** Its wall-clock is unmeasured and comes
   straight out of the 90 minutes.
-- **Whether it needs `sudo` is unresolved.** `/usr/bin` normally requires root;
-  the tutorial keeps a `sudo agy update` fallback, and the rehearsal should
-  record which branch actually fires so the guide can state one command rather
-  than two.
+- **It requires `sudo`, confirmed.** The unprivileged updater refuses in
+  0.377s with a clear error:
+
+  ```
+  Error: directory /usr/bin is not fully accessible (readable: true, writable: false)
+  ```
+
+  So the guide states `sudo agy update` outright rather than offering a
+  fallback. Cloud Shell grants passwordless sudo, so this costs nothing
+  interactively. Notably this is one of the few failures in this toolchain that
+  is loud and self-explaining.
 
 Note this does *not* buy correctness for LAB-06: the plugin behaviour it
 depends on is identical across 1.1.9, 1.1.13 and 1.1.16. It buys predictability
