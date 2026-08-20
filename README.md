@@ -250,9 +250,17 @@ because a model connected two skills on its own. That is also the governance
 pattern in miniature: a published standard with a documented hook, extended
 without forking.
 
-The skill source lives here in `skills/`. If the plugin install fails, the file
-is already on disk in a repo they cloned a week ago — one copy command, and
-nothing sat in the lab repo's discovery path in the meantime.
+The skill source lives here in `skills/`, alongside a root `plugin.json` that
+makes this repo installable with `agy plugin install .`. If the plugin install
+fails, the file is already on disk in a repo they cloned a week ago — one copy
+command, and nothing sat in the lab repo's discovery path in the meantime.
+
+A skill is only its `name` and `description` until something activates it; the
+body is loaded on demand. The description is what earns the invocation, so it
+is written to be matched, not to be read.
+
+See [`docs/verification/lab-01-antigravity-cli.md`](docs/verification/lab-01-antigravity-cli.md)
+for the verified CLI contract.
 
 ## Repos
 
@@ -326,10 +334,6 @@ Fast finishers run the eval, then hunt a second seeded ambiguity.
 
 ## Open questions
 
-- **`antigravity` is unverified.** The one dependency not yet installed and
-  exercised. Three things to check first: its auth flow (a localhost redirect
-  will not work in Cloud Shell, a device code will), whether it has a plugin
-  model and what `install` accepts, and its memory footprint.
 - **Timing.** The lab is ~73 minutes of content in a 90-minute half. That slack
   is the only slack, and the customer has a next meeting.
 - **`claat`.** Verify the export invocation and that the generated output serves
