@@ -9,6 +9,9 @@ locals {
 
   required_services = [
     "aiplatform.googleapis.com",
+    # The console's Sessions view refuses to render without it, which is where
+    # an attendee reads the agent's trajectory back.
+    "apphub.googleapis.com",
     "artifactregistry.googleapis.com",
     "cloudbuild.googleapis.com",
     "cloudresourcemanager.googleapis.com",
