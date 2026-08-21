@@ -252,16 +252,24 @@ $api
     *) MISSING="$MISSING $api" ;;
   esac
 done
+# Enabled here rather than left to Terraform, because everything after this
+# point talks to the project. Left off, one missing API becomes a column of red
+# further down -- the model call 403s because aiplatform is not on yet, which
+# reads as a second fault rather than the same one.
+AIPLATFORM_PENDING=0
+case "$MISSING" in *aiplatform.googleapis.com*) AIPLATFORM_PENDING=1 ;; esac
+
 if [ -z "$MISSING" ]; then
   ok "all $(echo "$REQUIRED_APIS" | wc -w | tr -d ' ') required APIs enabled"
+elif would "gcloud services enable$MISSING --project=$PROJECT"; then
+  info "enabling:$MISSING"
+  if gcloud services enable $MISSING --project="$PROJECT" 2>/dev/null; then
+    ok "enabled$MISSING"
+  else
+    fail "could not enable:$MISSING" "gcloud services enable$MISSING --project=$PROJECT"
+  fi
 else
-  # Not fatal: terraform enables them. Enabling here first makes the apply faster
-  # and the failure legible if the account cannot enable services.
   warn "not yet enabled:$MISSING"
-  # cloudresourcemanager is the exception: Terraform reads the project through
-  # it before it creates anything, so it cannot be the thing that enables it.
-  info "Terraform enables these itself, except cloudresourcemanager.googleapis.com, which it needs before it can read the project"
-  info "gcloud services enable$MISSING --project=$PROJECT"
 fi
 
 # --- 7. project parent, for the agent trust domain -------------------------
@@ -317,8 +325,15 @@ else
     200) ok "$MODEL answers from $MODEL_LOCATION" ;;
     404) fail "$MODEL returned 404 from '$MODEL_LOCATION'. The Gemini 3 family is served only from 'global'; a regional endpoint 404s with a message that names the model and reads like a typo." \
            'export MODEL_LOCATION=global' ;;
-    403) fail "403 calling $MODEL. Usually the API is not enabled, or billing is not linked." \
-           "gcloud services enable aiplatform.googleapis.com --project=$PROJECT" ;;
+    403) if [ "${AIPLATFORM_PENDING:-0}" -eq 1 ]; then
+           # Not a fault of its own: aiplatform was off when this run started,
+           # and a freshly enabled API takes a moment to answer. Red here sends
+           # people hunting a second problem that does not exist.
+           warn "$MODEL cannot be checked yet — aiplatform.googleapis.com was not enabled when this run started. Re-run preflight once it has propagated."
+         else
+           fail "403 calling $MODEL. Usually the API is not enabled, or billing is not linked." \
+             "gcloud services enable aiplatform.googleapis.com --project=$PROJECT"
+         fi ;;
     *)   fail "unexpected response calling $MODEL (http ${BODY:-none}): $(head -c 200 /tmp/preflight-model.json 2>/dev/null)" \
            "curl -H \"Authorization: Bearer \$(gcloud auth print-access-token)\" $MODEL_URL" ;;
   esac
