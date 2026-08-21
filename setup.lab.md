@@ -166,10 +166,18 @@ terminal wraps it across six or more lines.
 agy
 ```
 
-You will be asked to open a URL, then to paste back a code. The URL is emitted
-as a terminal hyperlink, so **try clicking it first**. Approve in the browser,
-copy the code it shows, paste it into the `authorization code...` field, press
-Enter, then leave with `/quit`.
+You will be asked to open a URL, then to paste back a code. Approve in the
+browser, copy the code it shows, paste it into the `authorization code...`
+field, press Enter, then leave with `/quit`.
+
+> aside negative
+>
+> **In the Cloud Shell terminal panel, do not click the URL.** It wraps, and the
+> click sends only the line you clicked — Google answers `Error 400 (Bad
+> Request)`, `invalid_request`, because the rest of the parameters never arrive.
+> Run `agy` from a terminal inside the editor (**Terminal → New Terminal**),
+> where a click opens the whole link. Selecting the URL across the wrap and
+> pasting it works too.
 
 > aside negative
 >

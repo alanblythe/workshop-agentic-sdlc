@@ -126,7 +126,9 @@ export AGENT_ENGINE_LOCATION=us-central1
 <p>Maximise your terminal first. The login prints a very long URL, and a narrow terminal wraps it across six or more lines.</p>
 <pre><code language="language-bash" class="language-bash">agy
 </code></pre>
-<p>You will be asked to open a URL, then to paste back a code. The URL is emitted as a terminal hyperlink, so <strong>try clicking it first</strong>. Approve in the browser, copy the code it shows, paste it into the <code>authorization code...</code> field, press Enter, then leave with <code>/quit</code>.</p>
+<p>You will be asked to open a URL, then to paste back a code. Approve in the browser, copy the code it shows, paste it into the <code>authorization code...</code> field, press Enter, then leave with <code>/quit</code>.</p>
+<aside class="warning"><p><strong>In the Cloud Shell terminal panel, do not click the URL.</strong> It wraps, and the click sends only the line you clicked — Google answers <code>Error 400 (Bad Request)</code>, <code>invalid_request</code>, because the rest of the parameters never arrive. Run <code>agy</code> from a terminal inside the editor (<strong>Terminal → New Terminal</strong>), where a click opens the whole link. Selecting the URL across the wrap and pasting it works too.</p>
+</aside>
 <aside class="warning"><p>Use plain <code>agy</code>, <strong>not </strong><code>agy -p</code>. Print mode caps the wait at 60 seconds and then fails with <code>authentication interrupted</code>. The interactive prompt has no timeout — it waits at an input field for as long as you need.</p>
 </aside>
 <p>The browser does not have to be on this machine. The redirect goes to a hosted callback rather than a localhost listener, which is what makes this work in Cloud Shell.</p>
