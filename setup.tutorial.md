@@ -1,17 +1,9 @@
 <!-- Generated from guides/setup.md.hbs by npm run build. Do not edit. -->
-summary: Prepare your own Google Cloud project for the Agentic SDLC workshop
-id: agentic-sdlc-setup
-categories: cloud,agents
-environments: Web
-status: Published
-authors: Alan Blythe
-feedback link: https://github.com/alanblythe/workshop-agentic-sdlc/issues
-
 # Set up your project before the workshop
 
 ## Before you begin
 
-Duration: 1
+<walkthrough-tutorial-duration duration="1"></walkthrough-tutorial-duration>
 
 This prepares **your own Google Cloud project** for the Agentic SDLC
 workshop. Do it any time before the session — it takes about fifteen minutes,
@@ -34,7 +26,7 @@ Nothing you do is reported anywhere. The output is for you.
 - `agy` updated and authenticated
 - The `spec-adversary` plugin installed
 
-> aside negative
+> **Careful:**
 >
 > **Do not fork this repository.** You clone it and run preflight from it. On
 > the day you fork a *different* repository — the lab one — and this
@@ -43,40 +35,29 @@ Nothing you do is reported anywhere. The output is for you.
 
 ## Get the repository
 
-Duration: 2
+<walkthrough-tutorial-duration duration="2"></walkthrough-tutorial-duration>
 
-The quickest route is Cloud Shell, which already has most of the toolchain:
+You already have it. This tutorial is being read from the clone Cloud Shell
+made when you opened it, and the shell below is sitting in that directory.
 
-<button>[Open in Cloud Shell](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/alanblythe/workshop-agentic-sdlc)</button>
-
-> aside positive
+> **Tip:**
 >
 > Tick **Trust repo** when Cloud Shell asks. It is remembered, and it is what
 > gives you a normal session with your real home directory rather than an
 > ephemeral one that discards anything you install.
 
-> aside negative
->
-> **Do not click that button twice.** It clones again rather than updating,
-> producing `workshop-agentic-sdlc-0`, `-1`, and opening the new copy — so
-> your earlier work sits in a directory you are no longer looking at. If you
-> come back later, `cd` into your existing clone and `git pull` instead.
-
-Prefer your own machine? Clone it normally:
-
-```bash
-git clone https://github.com/alanblythe/workshop-agentic-sdlc.git
-cd workshop-agentic-sdlc
-```
-
 ## Point at your project and authenticate
 
-Duration: 2
+<walkthrough-tutorial-duration duration="2"></walkthrough-tutorial-duration>
 
-Set the project you want to use:
+Pick the project you want to use:
+
+<walkthrough-project-setup></walkthrough-project-setup>
+
+Then point `gcloud` at it:
 
 ```bash
-gcloud config set project YOUR_PROJECT_ID
+gcloud config set project <walkthrough-project-id/>
 gcloud config get-value project
 ```
 
@@ -90,7 +71,7 @@ gcloud auth login --update-adc
 separate file from your `gcloud` login, and Terraform reads only that file —
 never your `gcloud` configuration.
 
-> aside negative
+> **Careful:**
 >
 > If you keep more than one `gcloud` configuration and switch with
 > `CLOUDSDK_CONFIG`, note that **Terraform ignores it entirely**. It reads
@@ -100,7 +81,7 @@ never your `gcloud` configuration.
 
 ## Choose your two locations
 
-Duration: 2
+<walkthrough-tutorial-duration duration="2"></walkthrough-tutorial-duration>
 
 Two settings, and they are **not** the same value:
 
@@ -114,7 +95,7 @@ export MODEL_LOCATION=global
 export AGENT_ENGINE_LOCATION=us-central1
 ```
 
-> aside negative
+> **Careful:**
 >
 > **Setting both to the same value is the mistake this stack punishes hardest.**
 > The workshop uses `gemini-3.6-flash`, and the whole Gemini 3 family is served
@@ -129,7 +110,7 @@ Add both to `~/.bashrc` if you want them to survive a new shell.
 
 ## Update agy
 
-Duration: 2
+<walkthrough-tutorial-duration duration="2"></walkthrough-tutorial-duration>
 
 Cloud Shell ships `agy` already, but the version varies between sessions —
 1.1.9 and 1.1.13 have been seen minutes apart. The workshop runs on the current
@@ -144,19 +125,16 @@ updater refuses with `directory /usr/bin is not fully accessible`. Cloud Shell
 grants passwordless sudo. It takes about twenty seconds, and the download runs
 on the Cloud Shell VM rather than over your own connection.
 
-> aside negative
+> **Careful:**
 >
 > **This is an every-session step.** `/usr/bin` is on the VM, not the
 > persistent disk, so the update is discarded whenever Cloud Shell recycles. If
 > you reconnect later, run it again — and if anything misbehaves afterwards,
 > check `agy --version` first.
 
-On a laptop, install it with `brew install --cask antigravity-cli`. The command
-is **`agy`**, not `antigravity`.
-
 ## Authenticate agy
 
-Duration: 3
+<walkthrough-tutorial-duration duration="3"></walkthrough-tutorial-duration>
 
 `agy` has **its own login, separate from `gcloud`**. Authenticating gcloud does
 nothing for it — it holds its own OAuth grant with its own scopes. Two logins,
@@ -175,7 +153,7 @@ as a terminal hyperlink, so **try clicking it first**. Approve in the browser,
 copy the code it shows, paste it into the `authorization code...` field, press
 Enter, then leave with `/quit`.
 
-> aside negative
+> **Careful:**
 >
 > Use plain `agy`, **not** `agy -p`. Print mode caps the wait at 60 seconds and
 > then fails with `authentication interrupted`. The interactive prompt has no
@@ -196,7 +174,7 @@ binary, it lives under `~/.gemini` and does survive a session recycle.
 
 ## Run preflight
 
-Duration: 3
+<walkthrough-tutorial-duration duration="3"></walkthrough-tutorial-duration>
 
 This checks everything above, then provisions your project.
 
@@ -217,7 +195,7 @@ linked, that the APIs are on, and that `gemini-3.6-flash` genuinely answers for
 you — with a real call, because a catalog entry describes the model rather than
 your access to it. Then it applies the Terraform.
 
-> aside positive
+> **Tip:**
 >
 > **Failures do not stop it.** Every problem is listed at the end with the exact
 > command that fixes it, so you get the whole list in one run rather than
@@ -239,7 +217,7 @@ involved, because the ADK skills install through `npx`.
 
 ## You're ready
 
-Duration: 1
+<walkthrough-tutorial-duration duration="1"></walkthrough-tutorial-duration>
 
 Preflight created an **empty** secret named `agentic-sdlc-deploy-key`. It stays
 empty until the day: the key is generated against the repository you fork

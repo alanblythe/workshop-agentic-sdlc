@@ -14,3 +14,6 @@ terraform/.terraform/
 terraform/*.tfstate
 terraform/*.tfstate.*
 terraform/*.tfvars
+
+# Authoring-time only; the guides are generated on a laptop, not by attendees.
+node_modules/

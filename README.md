@@ -276,7 +276,7 @@ One rule decides which repo a thing belongs in: **do students fork it?**
 
 | Repo | Students | What it is | Contents |
 | --- | --- | --- | --- |
-| `workshop-agentic-sdlc` | Clone and install from. Never fork | **Preflight and materials** | This README, classroom outline, `setup.lab.md`, `scripts/preflight.sh`, `terraform/`, `skills/` |
+| `workshop-agentic-sdlc` | Clone and install from. Never fork | **Preflight and materials** | This README, classroom outline, `guides/` and the `setup.lab.md` / `setup.tutorial.md` it renders, `scripts/preflight.sh`, `terraform/`, `skills/` |
 | `workshop-agentic-sdlc-lab` | Fork on the day | **Where the workshop day is spent** | The app, `docs/request.md`, `docs/spec.md`, `coder-agent/`, `scripts/setup-deploy-key.sh`, `lab.lab.md`, the codelab on Pages |
 
 If it is used before the session, it belongs in the first. If the attendee
@@ -314,6 +314,34 @@ Without those skills the attendee has a coding agent that does not know how to
 scaffold, evaluate, or deploy an ADK agent — which is most of the lab. This is
 the single highest-value thing preflight does, and the one with the most ways
 to fail, because it reaches npm *and* GitHub before the fork is ever involved.
+
+### Authoring the guides
+
+Each guide has **one source**, `guides/<name>.md.hbs`, rendered into both
+formats:
+
+```bash
+npm install       # once
+npm run build     # writes <name>.lab.md and <name>.tutorial.md
+```
+
+| Output | Format | Read |
+| --- | --- | --- |
+| `<name>.lab.md` | CLaaT codelab | anywhere, published to Pages via `claat export -o docs` |
+| `<name>.tutorial.md` | Cloud Shell walkthrough | in the Cloud Shell side panel |
+
+**Edit the `.hbs`, never the outputs** — they carry a generated header and are
+overwritten by the next build.
+
+The two formats agree on Markdown and on `##` marking a step, and disagree
+about everything else. `{{step "Title" 2}}` and `{{#aside "positive"}}` paper
+over the markup differences; `{{#codelab}}` and `{{#walkthrough}}` exist for
+the differences that markup cannot fix, where the reader's situation is
+genuinely different — a walkthrough reader is already in Cloud Shell with the
+repository cloned, so telling them to click **Open in Cloud Shell** is not a
+formatting problem but a wrong instruction.
+
+Node is needed only to author. Nothing an attendee runs depends on it.
 
 ### `preflight.sh`
 
