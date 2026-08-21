@@ -119,12 +119,22 @@ finish line. Stop when the property holds, and say so plainly:
 
 > I can't find a reading of this that would make the two halves disagree.
 
+Then stop. Do not carry on into the tests, and do not offer to: ask nothing,
+propose nothing, and wait.
+
 If the author stops you early, say what is still undecided and what will
 collide because of it.
 
 ## Emitting the contract
 
-Once the spec is buildable, write three test files:
+**Only when the author asks for it.** Interrogating a spec and emitting its
+contract are two jobs, and finishing the first does not begin the second.
+Reaching a buildable spec is a place to stop and say so. The author may want to
+read the resolved spec first, or have someone else read it, and tests written
+before they have done that are tests written against a spec nobody has
+accepted.
+
+Asked for it, write three test files:
 
 | File | Verifies | Asserts |
 | :--- | :--- | :--- |
