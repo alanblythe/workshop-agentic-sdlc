@@ -26,7 +26,7 @@ Nothing you do is reported anywhere. The output is for you.
 - The required APIs enabled on your project
 - An **empty** Secret Manager secret, waiting for a deploy key
 - `agy` updated and authenticated
-- The `spec-adversary` plugin installed
+- The `agentic-sdlc` plugin installed, with the spec adversary in it
 
 > **Careful:**
 >

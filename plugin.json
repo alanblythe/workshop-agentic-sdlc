@@ -1,5 +1,5 @@
 {
-  "name": "spec-adversary",
-  "description": "Interrogates a spec for ambiguity, one question at a time, until two parties could build from it independently.",
+  "name": "agentic-sdlc",
+  "description": "The agentic SDLC workshop: an adversary that interrogates a spec for ambiguity one question at a time, and a subagent that turns the resolved spec into contract tests.",
   "version": "0.1.0"
 }

@@ -241,8 +241,9 @@ repository by construction.
 
 Two distribution mechanisms, because they are two different conversations:
 
-- **`spec-adversary`** is installed from this repo, which students install from
-  and never fork. That is the governance story: a platform team publishes a
+- The **`agentic-sdlc`** plugin, carrying the adversary and the contract
+  writer, is installed from this repo, which students install from and never
+  fork. That is the governance story: a platform team publishes a
   vetted standard.
 - **`local-spec-rules`** the attendee writes themselves in about five minutes, a rule from their own team's experience, added to the adversary. That is the
   authoring story: five lines of markdown, no approval, no release.
@@ -368,7 +369,7 @@ Clone this repo and run `bash scripts/preflight.sh` **before the session**. It:
   any that are not
 - runs `agents-cli setup` and verifies the ADK skills landed in Antigravity's
   skill directory
-- installs the `spec-adversary` plugin and verifies it loads with
+- installs the `agentic-sdlc` plugin and verifies it loads with
   `agy plugin list`, which works without logging in
 - validates `AGENT_ENGINE_LOCATION` and `MODEL_LOCATION` by **making a real call
   to `gemini-3.6-flash`**, not by reading the model catalog. A catalog entry

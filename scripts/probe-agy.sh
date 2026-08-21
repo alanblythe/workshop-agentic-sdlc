@@ -57,9 +57,9 @@ timeout 60 agy plugin install "$REPO_ROOT" </dev/null 2>&1 | head -8
 echo "--- list after ---"
 timeout 30 agy plugin list </dev/null 2>&1 | head -20
 echo "--- where did it land ---"
-find ~/.gemini -maxdepth 4 -name "spec-adversary" 2>/dev/null | head -3
+find ~/.gemini -maxdepth 4 -name "agentic-sdlc" 2>/dev/null | head -3
 echo "--- uninstalling ---"
-timeout 60 agy plugin uninstall spec-adversary </dev/null 2>&1 | head -3
+timeout 60 agy plugin uninstall agentic-sdlc </dev/null 2>&1 | head -3
 
 hr "auth state / prompt shape (12s cap, will not complete a login)"
 timeout 12 agy -p "Reply with exactly: ok" </dev/null 2>&1 | head -20

@@ -391,38 +391,38 @@ if have uv; then
   fi
 fi
 
-# --- 11. the spec-adversary plugin -----------------------------------------
+# --- 11. the workshop plugin -----------------------------------------------
 # `agy plugin list` works unauthenticated, so this check does not require the
 # attendee to have logged in to agy yet.
-section "spec-adversary plugin"
+section "workshop plugin"
 
 if have agy; then
-  if agy plugin list 2>/dev/null | grep -q 'spec-adversary'; then
-    ok "spec-adversary is installed"
+  if agy plugin list 2>/dev/null | grep -q 'agentic-sdlc'; then
+    ok "agentic-sdlc is installed"
   elif would "cd $REPO_ROOT && agy plugin install ."; then
-    info "installing spec-adversary from this clone"
+    info "installing agentic-sdlc from this clone"
     ( cd "$REPO_ROOT" && agy plugin install . >/dev/null 2>&1 )
-    if agy plugin list 2>/dev/null | grep -q 'spec-adversary'; then
-      ok "spec-adversary installed"
+    if agy plugin list 2>/dev/null | grep -q 'agentic-sdlc'; then
+      ok "agentic-sdlc installed"
     else
-      fail "spec-adversary did not install from $REPO_ROOT" \
+      fail "agentic-sdlc did not install from $REPO_ROOT" \
         "cd $REPO_ROOT && agy plugin install ."
     fi
   else
-    warn "spec-adversary is not installed"
+    warn "agentic-sdlc is not installed"
   fi
   # The plugin carries two components and the install reports a count, not
   # which ones, so both are checked. Checked as files because that is what agy
   # reads them from and it needs no login; `agy plugin validate` would not help
   # either, since it never reads frontmatter and a broken component still
   # passes it.
-  PLUGIN_DIR="$HOME/.gemini/config/plugins/spec-adversary"
+  PLUGIN_DIR="$HOME/.gemini/config/plugins/agentic-sdlc"
   if [ -f "$PLUGIN_DIR/skills/spec-adversary/SKILL.md" ] \
      && [ -f "$PLUGIN_DIR/agents/contract-writer/agent.md" ]; then
     ok "the spec-adversary skill and the contract-writer subagent are installed"
   else
     fail "the plugin is missing a component" \
-      "cd $REPO_ROOT && agy plugin uninstall spec-adversary && agy plugin install ."
+      "cd $REPO_ROOT && agy plugin uninstall agentic-sdlc && agy plugin install ."
   fi
 fi
 
@@ -523,8 +523,8 @@ for d in $SKILL_DIRS; do
 done
 [ -n "$FOUND" ] && ok "ADK skills present" || fail "ADK skills are not installed" 'agents-cli setup --agent antigravity'
 
-agy plugin list 2>/dev/null | grep -q 'spec-adversary' \
-  && ok "spec-adversary installed" \
-  || fail "spec-adversary is not installed" "cd $REPO_ROOT && agy plugin install ."
+agy plugin list 2>/dev/null | grep -q 'agentic-sdlc' \
+  && ok "agentic-sdlc installed" \
+  || fail "agentic-sdlc is not installed" "cd $REPO_ROOT && agy plugin install ."
 
 report_and_exit
