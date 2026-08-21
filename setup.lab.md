@@ -47,7 +47,7 @@ Duration: 2
 
 The quickest route is Cloud Shell, which already has most of the toolchain:
 
-<button>[Open in Cloud Shell](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/alanblythe/workshop-agentic-sdlc)</button>
+<button>[Open in Cloud Shell](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/alanblythe/workshop-agentic-sdlc&cloudshell_tutorial=setup.tutorial.md)</button>
 
 > aside positive
 >
