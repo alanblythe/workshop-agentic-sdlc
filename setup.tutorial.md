@@ -142,29 +142,21 @@ nothing for it — it holds its own OAuth grant with its own scopes. Two logins,
 not one. There is no `agy login` subcommand; authentication happens on first
 use.
 
-Maximise your terminal first. The login prints a very long URL, and a narrow
-terminal wraps it across six or more lines.
-
 ```bash
-agy
+stty cols 2000; agy; stty sane
 ```
 
-You will be asked to open a URL, then to paste back a code. Approve in the
-browser, copy the code it shows, paste it into the `authorization code...`
-field, press Enter, then leave with `/quit`.
+You will be asked to open a URL, then to paste back a code. Click the URL,
+approve in the browser, copy the code it shows, paste it into the
+`authorization code...` field, press Enter, then leave with `/quit`.
 
-> **Careful:**
+> **Tip:**
 >
-> **In the Cloud Shell terminal panel, do not click the URL.** It wraps, and the
-> click sends only the line you clicked — Google answers `Error 400 (Bad
-> Request)`, `invalid_request`, because the rest of the parameters never arrive.
-> Run `agy` from a terminal inside the editor instead — **View → Terminal**, or
-> `` Ctrl+` `` — where a click opens the whole link. Selecting the URL across the wrap and
-> pasting it works too.
-
-If you did open one in the editor, close it once you are authenticated and
-come back to the Cloud Shell terminal below. The terminal icon on each command
-block sends to that one, not to a terminal you opened yourself.
+> `stty cols 2000` is what makes that URL clickable. `agy` wraps it to the width
+> the terminal reports, and a hard wrap leaves one fragment per line — clicking a
+> fragment sends an incomplete URL, and Google answers `Error 400 (Bad Request)`,
+> `invalid_request`. A reported width past the end of the URL keeps it on one
+> line. `stty sane` puts the width back.
 
 > **Careful:**
 >
