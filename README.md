@@ -12,7 +12,7 @@ Attendees work in **their own GCP projects and their own GitHub accounts**. The
 point is that it worked here, in their org, under their policies.
 
 Most agent demos are serial: you ask, the agent answers, you review. This
-workshop is about the next step — a developer and an agent building two halves
+workshop is about the next step, a developer and an agent building two halves
 of one feature **at the same time**, meeting at a seam that neither of them
 negotiated at runtime, because the spec declared it in advance.
 
@@ -24,7 +24,7 @@ thing.
 
 | Evolution step | The need it creates | What answers it |
 | --- | --- | --- |
-| Line of code → page of code | — | Models |
+| Line of code → page of code |, | Models |
 | A developer instructing an agent | A repeatable way to define one | ADK, `agents-cli` |
 | Agents that outlive your terminal | Somewhere to run, an identity | Agent Platform, Sessions |
 | Agents that remember across runs | State beyond one conversation | Memory Bank |
@@ -40,7 +40,7 @@ standalone tour.
 launched from an **Open in Cloud Shell** button inside it.
 
 `lab.lab.md` is authored in DevSite CLaaT format and rendered with `claat
-export` to GitHub Pages, so it looks like any other Google codelab — step
+export` to GitHub Pages, so it looks like any other Google codelab, step
 drawer, progress bar, `Duration:` tags summed in the navbar. Publishing it to
 `codelabs.developers.google.com` later is moving one file.
 
@@ -68,7 +68,7 @@ It starts from a request, not a spec:
 > QBRs now.
 
 That is unbuildable as written, and deliberately so. What counts as risk, what
-window matters, how many tiers there are, where the boundaries sit — none of it
+window matters, how many tiers there are, where the boundaries sit, none of it
 is stated, and all of it has to be decided before two parties can work in
 parallel.
 
@@ -89,7 +89,7 @@ that fits.
 ### The contract
 
 Three tests, emitted by the spec adversary and committed before either party
-starts. A contract is testable from both sides independently — that is what
+starts. A contract is testable from both sides independently, that is what
 makes it a contract rather than a wish.
 
 | Test | Verifies | Asserts |
@@ -107,7 +107,7 @@ attendee throughout.
 
 | # | Step | Duration |
 | --- | --- | --- |
-| 1 | Before you begin | — |
+| 1 | Before you begin |, |
 | 2 | Fork the lab and connect your agent | 0:08 |
 | 3 | Scaffold the coder agent and start its deploy | 0:05 |
 | 4 | File the request | 0:03 |
@@ -118,7 +118,7 @@ attendee throughout.
 | 9 | Teach the adversary a rule of your own | 0:06 |
 | 10 | Eval the adversary | 0:04 |
 | 11 | Clean up | 0:03 |
-| 12 | Congratulations | — |
+| 12 | Congratulations |, |
 | | **Total** | **59 min** |
 
 Fifty-nine minutes of content in the ninety-minute half. The slack is
@@ -128,7 +128,7 @@ deliberate: this runs in a customer's environment, which nobody has tested.
 step 7 verifies it before dispatching. Waiting for a deploy teaches nothing.
 
 **Step 5 is the lab.** The adversary surfaces one ambiguity at a time and shows
-both readings and how they diverge — *empty `seats_active`: zero, so the account
+both readings and how they diverge, *empty `seats_active`: zero, so the account
 collapsed, or unknown, so skip the month?* You choose. It writes your choice
 into the spec and moves on. It finds them; **you** decide them.
 
@@ -138,7 +138,7 @@ one nobody does.
 
 **Step 8 is the point.** It fits because the contract was precise, not because
 anyone coordinated. Attendees who resolved an ambiguity differently still
-succeed — the adversary encoded *their* decision into *their* contract, and both
+succeed, the adversary encoded *their* decision into *their* contract, and both
 agents coded against it. The lab does not require the right answer. It requires
 an answer, written down before work starts.
 
@@ -165,7 +165,7 @@ agent can do.
 ### Dispatch
 
 The agent is a Google API resource, not a public endpoint. The call is
-authorized by ADC — in Cloud Shell, the student's own identity — and held open
+authorized by ADC, in Cloud Shell, the student's own identity, and held open
 for the duration so the trajectory streams back:
 
 ```bash
@@ -193,8 +193,8 @@ webhook.
 
 The model is **`gemini-3.6-flash`**, which is served *only* from `global`. So
 `MODEL_LOCATION=global` is a requirement of the model, not a preference, and it
-stays independent of the engine region. Setting both to `us-central1` — the
-tidy-looking mistake — returns 404.
+stays independent of the engine region. Setting both to `us-central1`, the
+tidy-looking mistake, returns 404.
 
 `global` is a model endpoint, not a region. The whole Gemini 3 family is served
 only from it, and a regional endpoint returns **404** naming the model, which
@@ -208,7 +208,7 @@ documentation URLs are page slugs and 404 the same way a wrong region does.
 models are allowlisted per project and attendees run in their own.
 
 **Neither variable has a default.** A guessed region builds a URL that resolves
-and points somewhere else — the agent is reachable and its sessions come back
+and points somewhere else, the agent is reachable and its sessions come back
 empty, with nothing indicating why. Preflight refuses to continue if either is
 unset.
 
@@ -216,17 +216,17 @@ unset.
 
 The working copy is ephemeral. `/tmp` is tmpfs and counts against memory, so
 pytest and the app's dependencies are baked into the container image and the
-clone is shallow. **The durable state is the branch, not the filesystem** — a
+clone is shallow. **The durable state is the branch, not the filesystem**, a
 third category beside Sessions and Memory Bank: externalised artifacts.
 
 Start at 2 GB and measure; 1–2 vCPU is ample, since the loop is model-latency
 bound. The agent iterates until the contract test passes, bounded by a deadline
-derived from the invocation timeout rather than an attempt count — it pushes
+derived from the invocation timeout rather than an attempt count, it pushes
 what it has when the clock runs out.
 
 ### Push credentials
 
-The agent pushes with a **deploy key** — an SSH key scoped to one repository,
+The agent pushes with a **deploy key**, an SSH key scoped to one repository,
 created with the `gh` credentials the student already has:
 
 ```bash
@@ -244,8 +244,7 @@ Two distribution mechanisms, because they are two different conversations:
 - **`spec-adversary`** is installed from this repo, which students install from
   and never fork. That is the governance story: a platform team publishes a
   vetted standard.
-- **`local-spec-rules`** the attendee writes themselves in about five minutes —
-  a rule from their own team's experience, added to the adversary. That is the
+- **`local-spec-rules`** the attendee writes themselves in about five minutes, a rule from their own team's experience, added to the adversary. That is the
   authoring story: five lines of markdown, no approval, no release.
 
 The published skill declares the seam that makes this deterministic:
@@ -263,7 +262,7 @@ without forking.
 
 The skill source lives here in `skills/`, alongside a root `plugin.json` that
 makes this repo installable with `agy plugin install .`. If the plugin install
-fails, the file is already on disk in a repo they cloned a week ago — one copy
+fails, the file is already on disk in a repo they cloned a week ago, one copy
 command, and nothing sat in the lab repo's discovery path in the meantime.
 
 A skill is only its `name` and `description` until something activates it; the
@@ -280,7 +279,7 @@ One rule decides which repo a thing belongs in: **do students fork it?**
 | `workshop-agentic-sdlc-lab` | Fork on the day | **Where the workshop day is spent** | The app, `docs/request.md`, `docs/spec.md`, `coder-agent/`, `scripts/setup-deploy-key.sh`, `lab.lab.md`, the codelab on Pages |
 
 If it is used before the session, it belongs in the first. If the attendee
-touches it during the session, it belongs in the second — which is why the
+touches it during the session, it belongs in the second, which is why the
 deployed agent lives in the lab repo rather than beside the Terraform.
 
 The lab repo opens at kickoff. The rubric and the walkthrough are where the
@@ -311,7 +310,7 @@ Antigravity and links the skills into `~/.gemini/config/skills` and
 `~/.gemini/antigravity-cli/skills`.
 
 Without those skills the attendee has a coding agent that does not know how to
-scaffold, evaluate, or deploy an ADK agent — which is most of the lab. This is
+scaffold, evaluate, or deploy an ADK agent, which is most of the lab. This is
 the single highest-value thing preflight does, and the one with the most ways
 to fail, because it reaches npm *and* GitHub before the fork is ever involved.
 
@@ -333,14 +332,14 @@ bash scripts/publish.sh setup   # renders, exports, and adds the copy buttons
 | `<name>.lab.md` | CLaaT codelab | anywhere, published to Pages via `claat export -o docs` |
 | `<name>.tutorial.md` | Cloud Shell walkthrough | in the Cloud Shell side panel |
 
-**Edit the `.hbs`, never the outputs** — they carry a generated header and are
+**Edit the `.hbs`, never the outputs**, they carry a generated header and are
 overwritten by the next build.
 
 The two formats agree on Markdown and on `##` marking a step, and disagree
 about everything else. `{{step "Title" 2}}` and `{{#aside "positive"}}` paper
 over the markup differences; `{{#codelab}}` and `{{#walkthrough}}` exist for
 the differences that markup cannot fix, where the reader's situation is
-genuinely different — a walkthrough reader is already in Cloud Shell with the
+genuinely different, a walkthrough reader is already in Cloud Shell with the
 repository cloned, so telling them to click **Open in Cloud Shell** is not a
 formatting problem but a wrong instruction.
 
@@ -382,7 +381,7 @@ apply is that test.
 The deployed agent runs under **Agent Identity** rather than a service account,
 so nothing here creates one and no grant names a service agent. Its principal is
 federated, and the secret is granted to the set covering every Agent Runtime
-agent in the project — a member with no engine id in it, which is what lets the
+agent in the project, a member with no engine id in it, which is what lets the
 grant precede the engine by a week.
 
 Never mask a grant with `|| true`, and never guess a principal. Both produce the

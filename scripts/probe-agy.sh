@@ -15,7 +15,7 @@ echo "cloud shell: ${GOOGLE_CLOUD_SHELL:-no}"
 
 hr "is agy present, and where"
 if ! command -v agy >/dev/null 2>&1; then
-  echo "agy NOT on PATH — nothing else here will work."
+  echo "agy NOT on PATH, nothing else here will work."
   echo "PATH=$PATH"
   exit 1
 fi
@@ -34,7 +34,7 @@ grep -rhoE '(curl|wget|npm i(nstall)?|go install|brew install)[^|;&]*(antigravit
 
 hr "does the binary survive a session (persistence)"
 case "$(readlink -f "$AGY")" in
-  "$HOME"/*) echo "under \$HOME — persists across Cloud Shell sessions" ;;
+  "$HOME"/*) echo "under \$HOME, persists across Cloud Shell sessions" ;;
   *) echo "$(dirname "$(readlink -f "$AGY")") is on the VM, not the persistent disk."
      echo "Cloud Shell persists only \$HOME, so any update here is lost when the VM recycles." ;;
 esac
@@ -63,7 +63,7 @@ timeout 60 agy plugin uninstall spec-adversary </dev/null 2>&1 | head -3
 
 hr "auth state / prompt shape (12s cap, will not complete a login)"
 timeout 12 agy -p "Reply with exactly: ok" </dev/null 2>&1 | head -20
-echo "[exit ${PIPESTATUS[0]:-?} — a URL + paste prompt means unauthenticated; 'ok' means already authenticated]"
+echo "[exit ${PIPESTATUS[0]:-?}, a URL + paste prompt means unauthenticated; 'ok' means already authenticated]"
 
 hr "memory at rest"
 timeout 25 agy -p "Reply with exactly: ok" </dev/null >/dev/null 2>&1 &

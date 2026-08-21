@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Agentic SDLC workshop — preflight.
+# Agentic SDLC workshop, preflight.
 #
 # Run this in your own Google Cloud project, before the session. It reports
 # only to you; nothing is sent anywhere.
@@ -69,7 +69,7 @@ report_and_exit() {
     echo "  Everything checked out. Nothing to do until the session."
     exit 0
   fi
-  section "$FAILED problem(s) — each with the command that fixes it"
+  section "$FAILED problem(s), each with the command that fixes it"
   printf '%s\n' "$FIXES"
   echo "Fix these and run preflight again. It is safe to re-run."
   exit 1
@@ -133,7 +133,7 @@ check_tool gcloud    'https://cloud.google.com/sdk/docs/install'
 check_tool terraform 'brew install terraform    # or https://developer.hashicorp.com/terraform/install'
 check_tool uv        'curl -LsSf https://astral.sh/uv/install.sh | sh'
 check_tool gh        'brew install gh    # or https://cli.github.com'
-check_tool npx       'install Node.js — https://nodejs.org (Cloud Shell has it already)'
+check_tool npx       'install Node.js, https://nodejs.org (Cloud Shell has it already)'
 # The binary is agy. `antigravity` is the IDE cask, not this.
 check_tool agy       'brew install --cask antigravity-cli    # the command is agy, not antigravity'
 [ -n "$TOOLS_OK" ] && ok "present:$TOOLS_OK"
@@ -193,7 +193,7 @@ if have gcloud; then
   if [ -n "${PROJECT:-}" ] && [ "$PROJECT" != "(unset)" ]; then
     PROJECT_NUMBER=$(gcloud projects describe "$PROJECT" --format='value(projectNumber)' 2>/dev/null)
     if [ -z "$PROJECT_NUMBER" ]; then
-      blocker "cannot read project '$PROJECT' — wrong id, or your account has no access to it" \
+      blocker "cannot read project '$PROJECT', wrong id, or your account has no access to it" \
         "gcloud projects describe $PROJECT"
     else
       BILLED=$(gcloud beta billing projects describe "$PROJECT" --format='value(billingEnabled)' 2>/dev/null)
@@ -273,7 +273,7 @@ fi
 
 # --- 7. project parent, for the agent trust domain -------------------------
 # The agent's principal lives in a workload identity pool named after the
-# project's parent. Terraform derives it, and refuses when it cannot — a
+# project's parent. Terraform derives it, and refuses when it cannot, a
 # folder-parented project reports no org_id. Detect that here and pass the
 # value in, rather than letting the apply fail with something cryptic.
 section "agent trust domain"
@@ -284,13 +284,13 @@ TRUST_DOMAIN_ARG=""
 
 case "$PARENT_TYPE" in
   organization)
-    ok "project is under organization $PARENT_ID — Terraform derives the trust domain"
+    ok "project is under organization $PARENT_ID. Terraform derives the trust domain"
     ;;
   folder)
     ORG_ID=$(gcloud projects get-ancestors "$PROJECT" --format='value(id,type)' 2>/dev/null | awk '$2=="organization"{print $1}')
     if [ -n "$ORG_ID" ]; then
       TRUST_DOMAIN_ARG="-var=agent_trust_domain=agents.global.org-${ORG_ID}.system.id.goog"
-      ok "project is in a folder under organization $ORG_ID — passing the trust domain explicitly"
+      ok "project is in a folder under organization $ORG_ID, passing the trust domain explicitly"
     else
       fail "project is in a folder and its organization could not be resolved. Terraform cannot derive the agent trust domain, and guessing is worse than failing: a binding to the wrong trust domain is accepted and grants nothing." \
         "gcloud projects get-ancestors $PROJECT    # then re-run with:
@@ -300,7 +300,7 @@ case "$PARENT_TYPE" in
   *)
     # No organization. The pool is named after the project instead. This path
     # is not yet verified against a real no-org project.
-    warn "project has no organization — the trust domain becomes agents.global.project-${PROJECT_NUMBER}.system.id.goog"
+    warn "project has no organization, the trust domain becomes agents.global.project-${PROJECT_NUMBER}.system.id.goog"
     warn "this path is UNVERIFIED; if the agent later cannot read the deploy key, this is the first thing to suspect"
     ;;
 esac
@@ -328,7 +328,7 @@ else
            # Not a fault of its own: aiplatform was off when this run started,
            # and a freshly enabled API takes a moment to answer. Red here sends
            # people hunting a second problem that does not exist.
-           warn "$MODEL cannot be checked yet — aiplatform.googleapis.com was not enabled when this run started. Re-run preflight once it has propagated."
+           warn "$MODEL cannot be checked yet, aiplatform.googleapis.com was not enabled when this run started. Re-run preflight once it has propagated."
          else
            fail "403 calling $MODEL. Usually the API is not enabled, or billing is not linked." \
              "gcloud services enable aiplatform.googleapis.com --project=$PROJECT"
@@ -358,7 +358,7 @@ section "agents-cli and ADK skills"
 
 if have uv; then
   if have agents-cli; then
-    ok "agents-cli — $(agents-cli --version 2>/dev/null | head -1)"
+    ok "agents-cli, $(agents-cli --version 2>/dev/null | head -1)"
   elif would "uv tool install google-agents-cli"; then
     warn "agents-cli not installed; installing"
     uv tool install google-agents-cli >/dev/null 2>&1 \
@@ -385,7 +385,7 @@ if have uv; then
     elif [ "$PLAN_ONLY" -eq 1 ]; then
       warn "ADK skills are not installed for Antigravity yet; a real run installs them"
     else
-      fail "ADK skills did not land in ~/.gemini. agents-cli setup shells out to 'npx -y skills add <github url> -g', so this usually means npm or github was unreachable. Note it installs into whichever coding agent it detects — if you also use Claude Code, check ~/.claude/skills before assuming it failed." \
+      fail "ADK skills did not land in ~/.gemini. agents-cli setup shells out to 'npx -y skills add <github url> -g', so this usually means npm or github was unreachable. Note it installs into whichever coding agent it detects, if you also use Claude Code, check ~/.claude/skills before assuming it failed." \
         'agents-cli setup --agent antigravity'
     fi
   fi
@@ -433,14 +433,14 @@ fi
 ok "terraform initialised"
 
 # Idempotency across clones. Preflight may run in a different clone from the
-# one that ran it last — clicking the Open in Cloud Shell link again produces
-# workshop-agentic-sdlc-0, -1, ... rather than updating the first — and the
+# one that ran it last, clicking the Open in Cloud Shell link again produces
+# workshop-agentic-sdlc-0, -1, ... rather than updating the first, and the
 # state file is local and gitignored. A secret that exists but is absent from
 # state fails the apply with 409 already exists, so adopt it instead.
 if ! terraform -chdir="$TF_DIR" state list 2>/dev/null | grep -q 'google_secret_manager_secret.deploy_key'; then
   if gcloud secrets describe "$SECRET_ID" --project="$PROJECT" >/dev/null 2>&1 \
      && would "terraform import google_secret_manager_secret.deploy_key"; then
-    info "secret $SECRET_ID exists but is not in this clone's state — importing"
+    info "secret $SECRET_ID exists but is not in this clone's state, importing"
     if terraform -chdir="$TF_DIR" import $TF_VARS \
         google_secret_manager_secret.deploy_key "projects/$PROJECT/secrets/$SECRET_ID" >/dev/null 2>&1; then
       ok "imported the existing secret"
@@ -466,7 +466,7 @@ if terraform -chdir="$TF_DIR" apply -input=false -auto-approve $TF_VARS >/tmp/pr
   [ -n "$SECRET_OUT" ] && info "deploy key secret: $SECRET_OUT (empty until the day)"
   [ -n "$PSET" ] && info "agent principal:   $PSET"
 else
-  fail "terraform apply failed — see /tmp/preflight-tf.log
+  fail "terraform apply failed, see /tmp/preflight-tf.log
 $(tail -15 /tmp/preflight-tf.log | sed 's/^/      /')" \
     "terraform -chdir=$TF_DIR apply $TF_VARS"
 fi
@@ -496,7 +496,7 @@ CODE=$(curl -sS --max-time 60 -o /dev/null -w '%{http_code}' \
   "https://${MODEL_HOST}/v1/projects/${PROJECT}/locations/${MODEL_LOCATION}/publishers/google/models/${MODEL}:generateContent" \
   -d '{"contents":[{"role":"user","parts":[{"text":"reply with the single word: ready"}]}]}' 2>/dev/null)
 [ "$CODE" = "200" ] && ok "$MODEL answers from $MODEL_LOCATION" \
-  || fail "$MODEL still not answering (http ${CODE:-none}) — a freshly enabled API can take a minute" \
+  || fail "$MODEL still not answering (http ${CODE:-none}), a freshly enabled API can take a minute" \
        "bash scripts/preflight.sh"
 
 gcloud secrets describe "$SECRET_ID" --project="$PROJECT" >/dev/null 2>&1 \

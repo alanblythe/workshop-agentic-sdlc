@@ -53,7 +53,7 @@ variable "agent_trust_domain" {
     Leave empty and it is derived from the project's parent: the org- form for
     a project directly under an organization, the project- form for one with no
     organization. A project under a folder reports neither here, and the apply
-    refuses rather than guessing — a binding to the wrong trust domain is
+    refuses rather than guessing, a binding to the wrong trust domain is
     accepted and grants nothing, which is worse than a failure.
   EOT
 }

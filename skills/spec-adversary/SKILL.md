@@ -22,8 +22,7 @@ Repeat until the spec is buildable:
 5. Go back to 1.
 
 **One at a time.** Never produce a list, a report, or a numbered set of
-findings. A batch invites a batch answer, and a batch answer is not a decision
-— it is a skim. The whole method depends on the author holding exactly one
+findings. A batch invites a batch answer, and a batch answer is not a decision, it is a skim. The whole method depends on the author holding exactly one
 question in their head.
 
 ## How to show an ambiguity
@@ -32,7 +31,7 @@ Three parts, always:
 
 1. **The passage**, quoted.
 2. **Two readings**, each stated as a rule a builder could follow.
-3. **The assertion that differs** — a concrete, named case where the two
+3. **The assertion that differs**, a concrete, named case where the two
    readings produce different output.
 
 ```
@@ -49,12 +48,11 @@ Three parts, always:
   These disagree on every export with a gap in it.
 ```
 
-The third part is what makes this work. A question alone —
-*"what does an empty `seats_active` mean?"* — is answerable with a shrug. A
+The third part is what makes this work. A question alone, *"what does an empty `seats_active` mean?"*, is answerable with a shrug. A
 question with a visible consequence is answerable only with a decision.
 
 **Both readings must be genuinely defensible.** If one is obviously right, it
-is not an ambiguity, it is a typo — fix it silently and move on.
+is not an ambiguity, it is a typo, fix it silently and move on.
 
 ## Never propose-and-approve
 
@@ -66,8 +64,7 @@ If the author asks you to choose, decline and say why: a spec they approved is
 a spec they will not have read, and the entire point is that they own the
 decisions the builders will be bound by.
 
-If the author answers vaguely — *"the sensible one"*, *"whatever's normal"* —
-that is not a decision. Ask again, naming the two readings.
+If the author answers vaguely, *"the sensible one"*, *"whatever's normal"*, that is not a decision. Ask again, naming the two readings.
 
 ## Recording a resolution
 
@@ -110,7 +107,7 @@ Once the spec is buildable, write three test files:
 **Each side must be testable alone.** A test that needs both halves cannot be
 run by either party while they work, which makes it a wish rather than a
 contract. Write the `MonthSnapshot` list out longhand in
-`test_score_contract.py` — that longhand list *is* the seam.
+`test_score_contract.py`, that longhand list *is* the seam.
 
 ### Derive every value; invent none
 
@@ -122,8 +119,7 @@ being ambiguous, and it is the most valuable signal you have. Stop, say which
 assertion you cannot write and which decision is missing, and reopen that
 question:
 
-> I can't write the expected `tier` for a 3-month account with one gap —
-> the spec fixes the boundary at 40% but doesn't say whether the drop is
+> I can't write the expected `tier` for a 3-month account with one gap, > the spec fixes the boundary at 40% but doesn't say whether the drop is
 > measured against the first month or the previous one.
 
 Then resolve it as a normal ambiguity and continue.

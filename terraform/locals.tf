@@ -28,7 +28,7 @@ locals {
   # The trust domain is the workload identity pool the agent's principal lives
   # in, and it is named after the project's parent. A project directly under an
   # organization and one with no organization at all get different pools, and a
-  # project under a folder does not report an org_id here at all — hence the
+  # project under a folder does not report an org_id here at all, hence the
   # override, and the precondition in secret.tf that refuses to guess.
   derived_trust_domain = (
     data.google_project.this.org_id != "" ?
@@ -42,6 +42,6 @@ locals {
 
   # Every Agent Runtime agent in this project, rather than one engine by id.
   # No engine id appears in it, so the grant can be made before the engine
-  # exists — which is what lets preflight run a week before the session.
+  # exists, which is what lets preflight run a week before the session.
   agent_principal_set = "principalSet://${local.agent_trust_domain}/attribute.platformContainer/aiplatform/projects/${data.google_project.this.number}"
 }

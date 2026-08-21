@@ -8,7 +8,7 @@
 <walkthrough-tutorial-duration duration="1"></walkthrough-tutorial-duration>
 
 This prepares **your own Google Cloud project** for the Agentic SDLC
-workshop. Do it any time before the session — it takes about twenty minutes,
+workshop. Do it any time before the session. It takes about twenty minutes,
 and nothing here competes with the lab for time on the day.
 
 Nothing you do is reported anywhere. The output is for you.
@@ -31,7 +31,7 @@ Nothing you do is reported anywhere. The output is for you.
 > **Careful:**
 >
 > **Do not fork this repository.** You clone it and run preflight from it. On
-> the day you fork a *different* repository — the lab one. Forks do not copy
+> the day you fork a *different* repository, the lab one. Forks do not copy
 > issues, and the lab repo stays sealed until kickoff.
 
 ## Get the repository
@@ -76,7 +76,7 @@ gcloud auth login --update-adc
 ```
 
 `--update-adc` is easy to miss. Application Default Credentials are a
-separate file from your `gcloud` login, and Terraform reads only that file —
+separate file from your `gcloud` login, and Terraform reads only that file,
 never your `gcloud` configuration.
 
 > **Careful:**
@@ -138,7 +138,7 @@ refuses with `directory /usr/bin is not fully accessible`.
 <walkthrough-tutorial-duration duration="1"></walkthrough-tutorial-duration>
 
 Cloud Shell has a `terraform` on `PATH`, but it is a stub that prints install
-instructions and exits 0 — every command appears to succeed while doing
+instructions and exits 0. Every command appears to succeed while doing
 nothing, including the apply that provisions your project. Preflight refuses to
 run against it.
 
@@ -181,7 +181,7 @@ a short one-time code and a `github.com/login/device` URL to enter it at.
 
 > **Tip:**
 >
-> Preflight checks this as well, but it runs to the end before reporting —
+> Preflight checks this as well, but it runs to the end before reporting,
 > including the Terraform apply. Fixing it here saves that wait.
 
 ## Authenticate agy
@@ -189,22 +189,22 @@ a short one-time code and a `github.com/login/device` URL to enter it at.
 <walkthrough-tutorial-duration duration="3"></walkthrough-tutorial-duration>
 
 `agy` has **its own login, separate from `gcloud`**. Authenticating gcloud does
-nothing for it — it holds its own OAuth grant with its own scopes. Two logins,
+nothing for it. It holds its own OAuth grant with its own scopes. Two logins,
 not one. There is no `agy login` subcommand; authentication happens on first
 use.
 
-Two ways to get a URL you can click. Either works — the first keeps you in this
+Two ways to get a URL you can click. Either works. The first keeps you in this
 terminal, the second needs no widening.
 
-### Option 1 — widen this terminal
+### Option 1: widen this terminal
 
 ```bash
 COLS=$(tput cols); stty cols 2000; agy; stty cols "$COLS"
 ```
 
-### Option 2 — use the editor's terminal
+### Option 2: use the editor's terminal
 
-**View → Terminal**, or `` Ctrl+` `` — a click there opens the whole link as it
+**View → Terminal**, or `` Ctrl+` ``. A click there opens the whole link as it
 is, with no widening.
 
 ```bash
@@ -223,7 +223,7 @@ approve in the browser, copy the code it shows, paste it into the
 > past the end of the URL removes the reason to wrap; the editor's terminal
 > instead reads the hyperlink the escape codes carry, so the wrap does not matter
 > there. The real width is captured and set back afterwards because nothing else
-> restores it — `stty sane` resets the line discipline and leaves the size alone.
+> restores it. `stty sane` resets the line discipline and leaves the size alone.
 
 If you use the editor's terminal, come back to the one below afterwards. The
 terminal icon on each command block sends to that one, not to a terminal you
@@ -246,7 +246,7 @@ binary, it lives under `~/.gemini` and does survive a session recycle.
 
 <walkthrough-tutorial-duration duration="1"></walkthrough-tutorial-duration>
 
-Preflight's Terraform turns on every API this workshop needs — except the one
+Preflight's Terraform turns on every API this workshop needs, except the one
 it needs in order to read the project at all. Turn that one on yourself:
 
 ```bash
@@ -266,7 +266,7 @@ gcloud services enable cloudresourcemanager.googleapis.com
 
 This checks everything above, then provisions your project.
 
-Look first if you like — with `--plan-only` it changes nothing at all:
+Look first if you like. With `--plan-only` it changes nothing at all:
 
 ```bash
 bash scripts/preflight.sh --plan-only
@@ -280,14 +280,14 @@ bash scripts/preflight.sh
 
 It verifies your tools, that npm and github are reachable, that billing is
 linked, that the APIs are on, and that `gemini-3.6-flash` genuinely answers for
-you — with a real call, because a catalog entry describes the model rather than
+you, with a real call, because a catalog entry describes the model rather than
 your access to it. Then it applies the Terraform.
 
 > **Tip:**
 >
 > **Failures do not stop it.** Every problem is listed at the end with the exact
 > command that fixes it, so you get the whole list in one run rather than
-> discovering them one at a time. Fix them and run it again — it is safe to
+> discovering them one at a time. Fix them and run it again. It is safe to
 > re-run, and safe to run in a fresh clone.
 
 ### Verify your work

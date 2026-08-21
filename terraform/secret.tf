@@ -1,5 +1,5 @@
-# Terraform owns the container. The value — a deploy key generated against the
-# attendee's fork — is added as a version on the day, and nothing here diffs it.
+# Terraform owns the container. The value, a deploy key generated against the
+# attendee's fork, is added as a version on the day, and nothing here diffs it.
 resource "google_secret_manager_secret" "deploy_key" {
   project   = var.project_id
   secret_id = local.deploy_key_secret_id
