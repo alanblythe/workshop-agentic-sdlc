@@ -162,6 +162,10 @@ field, press Enter, then leave with `/quit`.
 > where a click opens the whole link. Selecting the URL across the wrap and
 > pasting it works too.
 
+If you did open one in the editor, close it once you are authenticated and
+come back to the Cloud Shell terminal below. The terminal icon on each command
+block sends to that one, not to a terminal you opened yourself.
+
 > **Careful:**
 >
 > Use plain `agy`, **not** `agy -p`. Print mode caps the wait at 60 seconds and
