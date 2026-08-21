@@ -215,14 +215,16 @@ use.
 Two ways to get a URL you can click. Either works — the first keeps you in this
 terminal, the second needs no widening.
 
-**Here**, widen the terminal for the duration of the login:
+### ▸ Option 1 — widen this terminal
 
 ```bash
 COLS=$(tput cols); stty cols 2000; agy; stty cols "$COLS"
 ```
 
-**Or in the editor's terminal** — **View → Terminal**, or `` Ctrl+` `` — where a
-click opens the whole link as it is:
+### ▸ Option 2 — use the editor's terminal
+
+**View → Terminal**, or `` Ctrl+` `` — a click there opens the whole link as it
+is, with no widening.
 
 ```bash
 agy

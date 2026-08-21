@@ -237,18 +237,20 @@ use.
 Two ways to get a URL you can click. Either works — the first keeps you in this
 terminal, the second needs no widening.
 
-**Here**, widen the terminal for the duration of the login:
-
+{{#collapse "Option 1 — widen this terminal"}}
 ```bash
 COLS=$(tput cols); stty cols 2000; agy; stty cols "$COLS"
 ```
+{{/collapse}}
 
-**Or in the editor's terminal** — **View → Terminal**, or `` Ctrl+` `` — where a
-click opens the whole link as it is:
+{{#collapse "Option 2 — use the editor's terminal"}}
+**View → Terminal**, or `` Ctrl+` `` — a click there opens the whole link as it
+is, with no widening.
 
 ```bash
 agy
 ```
+{{/collapse}}
 
 You will be asked to open a URL, then to paste back a code. Click the URL,
 approve in the browser, copy the code it shows, paste it into the
