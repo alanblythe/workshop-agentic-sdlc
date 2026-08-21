@@ -1,4 +1,4 @@
-<!-- Generated from guides/setup.md.hbs by npm run build. Do not edit. -->
+<!-- Generated from guides/setup.md.hbs by the presenter repo. Do not edit. -->
 summary: Prepare your own Google Cloud project for the Agentic SDLC workshop
 id: agentic-sdlc-setup
 categories: cloud,agents

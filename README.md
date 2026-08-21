@@ -320,9 +320,12 @@ to fail, because it reaches npm *and* GitHub before the fork is ever involved.
 Each guide has **one source**, `guides/<name>.md.hbs`, rendered into both
 formats:
 
+The renderer lives in the private `agentic-sdlc-presenter` repo, cloned beside
+this one, so that one copy serves both guide repos:
+
 ```bash
-npm install       # once
-npm run build     # writes <name>.lab.md and <name>.tutorial.md
+cd ../agentic-sdlc-presenter
+bash scripts/publish.sh setup   # renders, exports, and adds the copy buttons
 ```
 
 | Output | Format | Read |

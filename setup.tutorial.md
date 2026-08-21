@@ -1,4 +1,4 @@
-<!-- Generated from guides/setup.md.hbs by npm run build. Do not edit. -->
+<!-- Generated from guides/setup.md.hbs by the presenter repo. Do not edit. -->
 # Agentic SDLC workshop: set up your project
 
 <walkthrough-tutorial-duration duration="18"></walkthrough-tutorial-duration>
