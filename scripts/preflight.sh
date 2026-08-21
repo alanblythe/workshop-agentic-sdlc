@@ -17,6 +17,12 @@
 
 set -uo pipefail
 
+# Nothing here reads input, and several things it calls will ask for some --
+# gcloud offers to enable an API, agents-cli setup picks an agent. Their output
+# is redirected, so a prompt would hang with nothing on screen. Closed stdin
+# turns that into an immediate failure with a message.
+exec </dev/null
+
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 TF_DIR="$REPO_ROOT/terraform"
 MODEL="gemini-3.6-flash"
@@ -128,9 +134,18 @@ check_tool npx       'install Node.js — https://nodejs.org (Cloud Shell has it
 # The binary is agy. `antigravity` is the IDE cask, not this.
 check_tool agy       'brew install --cask antigravity-cli    # the command is agy, not antigravity'
 
+# Being on PATH is not the same as being installed. Cloud Shell ships a stub
+# that prints install instructions and exits 0, so every terraform command
+# "succeeds" while doing nothing -- init reports ok and the apply changes
+# nothing. Reporting a version is the thing only a real binary can do.
 if have terraform; then
   TFV=$(terraform version -json 2>/dev/null | sed -n 's/.*"terraform_version": *"\([^"]*\)".*/\1/p' | head -1)
-  [ -n "$TFV" ] && info "terraform $TFV (the config needs >= 1.9.0 for cross-variable validation)"
+  if [ -n "$TFV" ]; then
+    ok "terraform $TFV (the config needs >= 1.9.0 for cross-variable validation)"
+  else
+    fail "terraform is on PATH but does not report a version, so it is a stub rather than the real binary. Cloud Shell ships one of these." \
+      'wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list && sudo apt update && sudo apt install -y terraform'
+  fi
 fi
 
 # --- 3. reachability -------------------------------------------------------
@@ -312,8 +327,9 @@ fi
 section "github"
 
 if have gh; then
-  if gh auth status >/dev/null 2>&1; then
-    ok "gh is authenticated"
+  if GH_STATUS=$(gh auth status 2>&1); then
+    GH_USER=$(printf '%s\n' "$GH_STATUS" | sed -n 's/.*\(account\|as\) \([A-Za-z0-9._-]*\).*/\2/p' | head -1)
+    ok "gh is authenticated${GH_USER:+ as $GH_USER}"
   else
     fail "gh is not authenticated. You fork the lab repo and add a deploy key on the day, both through gh." 'gh auth login'
   fi
