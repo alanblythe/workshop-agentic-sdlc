@@ -411,15 +411,17 @@ if have agy; then
   else
     warn "spec-adversary is not installed"
   fi
-  # A name `--agent` does not know is not an error: agy silently runs the
-  # ordinary agent instead, so the lab's persona is confirmed present rather
-  # than assumed. Checked as a file because that is what agy reads agents from
-  # and it needs no login, which `agy plugin validate` would not give us
-  # either: it never reads frontmatter, so a broken component still passes.
-  if [ -f "$HOME/.gemini/config/plugins/spec-adversary/agents/spec-adversary/agent.md" ]; then
-    ok "the spec-adversary agent is registered"
+  # The plugin carries two components and the install reports a count, not
+  # which ones, so both are checked. Checked as files because that is what agy
+  # reads them from and it needs no login; `agy plugin validate` would not help
+  # either, since it never reads frontmatter and a broken component still
+  # passes it.
+  PLUGIN_DIR="$HOME/.gemini/config/plugins/spec-adversary"
+  if [ -f "$PLUGIN_DIR/skills/spec-adversary/SKILL.md" ] \
+     && [ -f "$PLUGIN_DIR/agents/contract-writer/agent.md" ]; then
+    ok "the spec-adversary skill and the contract-writer subagent are installed"
   else
-    fail "the spec-adversary plugin has no agent in it" \
+    fail "the plugin is missing a component" \
       "cd $REPO_ROOT && agy plugin uninstall spec-adversary && agy plugin install ."
   fi
 fi
