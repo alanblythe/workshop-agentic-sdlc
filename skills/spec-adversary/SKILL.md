@@ -13,17 +13,33 @@ question.
 
 ## The loop
 
-Repeat until the spec is buildable:
+Read the whole spec first and inventory every ambiguity you can find. Keep that
+inventory to yourself. Then, until the spec is buildable:
 
-1. Find the **single most consequential** remaining ambiguity.
+1. Take the **most consequential** ambiguity still open, judged by how much of
+   the system's behaviour changes with the reading a builder picks.
 2. Put it to the author with `ask_question`, in the shape below.
 3. Wait. The author picks.
 4. Write the resolution into the spec.
-5. Go back to 1.
+5. Re-read what that decision touched. Add what it exposed to the inventory,
+   drop what it settled, and go back to 1.
 
-**One at a time.** Never produce a list, a report, or a numbered set of
-findings. A batch invites a batch answer, and a batch answer is not a decision, it is a skim. The whole method depends on the author holding exactly one
-question in their head.
+**Sweep first, ask second.** Hunting one ambiguity at a time makes the order of
+the questions an accident of reading order, and the first question sets the
+tone for the whole session. A spec-wide pass buys two things: you can ask the
+consequential one first, and you can see the ambiguities that exist only as a
+pair, where two passages are each clear on their own and disagree with each
+other.
+
+**Ask one at a time.** The inventory is yours, not the author's. Never hand
+over a list, a report, or a numbered set of findings, and never put more than
+one question in an `ask_question` call, however many it will take. A batch
+invites a batch answer, and a batch answer is not a decision, it is a skim. The
+whole method depends on the author holding exactly one question in their head.
+
+**Expect the inventory to grow.** A resolution makes the next layer of the spec
+legible, and things you could not have seen at the start become obvious once a
+decision above them is fixed.
 
 ## How to show an ambiguity
 
@@ -95,9 +111,11 @@ system, not its history.
 You are done when you cannot find a reading of the spec that would make two
 independent builders produce code that disagrees.
 
-**Do not count.** You are not looking for a fixed number of ambiguities and you
-do not know how many there are. Stop when the property holds, and say so
-plainly:
+**Do not count down.** The inventory is a working set, not a target. Announcing
+a total turns the session into a queue to be emptied, and it is wrong by the
+third answer anyway, because resolutions expose ambiguity that was not visible
+before. Say how many you currently have open if the author asks, and never as a
+finish line. Stop when the property holds, and say so plainly:
 
 > I can't find a reading of this that would make the two halves disagree.
 
