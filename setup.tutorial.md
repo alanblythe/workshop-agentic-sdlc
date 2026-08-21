@@ -1,5 +1,7 @@
 <!-- Generated from guides/setup.md.hbs by npm run build. Do not edit. -->
-# Set up your project before the workshop
+# Agentic SDLC workshop: set up your project
+
+<walkthrough-tutorial-duration duration="16"></walkthrough-tutorial-duration>
 
 ## Before you begin
 

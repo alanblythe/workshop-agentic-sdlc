@@ -7,7 +7,7 @@ status: Published
 authors: Alan Blythe
 feedback link: https://github.com/alanblythe/workshop-agentic-sdlc/issues
 
-# Set up your project before the workshop
+# Agentic SDLC workshop: set up your project
 
 ## Before you begin
 
@@ -45,7 +45,10 @@ Nothing you do is reported anywhere. The output is for you.
 
 Duration: 2
 
-The quickest route is Cloud Shell, which already has most of the toolchain:
+The quickest route is Cloud Shell, which already has most of the toolchain.
+The button clones the repository *and* opens this guide in a panel beside
+the shell, so each step sits next to the terminal you are typing it into —
+nothing to keep in a second tab, and nothing to alt-tab between.
 
 <button>[Open in Cloud Shell](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/alanblythe/workshop-agentic-sdlc&cloudshell_tutorial=setup.tutorial.md)</button>
 
