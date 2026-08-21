@@ -109,11 +109,11 @@ export AGENT_ENGINE_LOCATION=us-central1
       </google-codelab-step>
     
       <google-codelab-step label="Update agy" duration="2">
-        <p>Cloud Shell ships <code>agy</code> already, but the version varies between sessions — 1.1.9 and 1.1.13 have been seen minutes apart. The workshop runs on the current release so everyone is on the same one.</p>
+        <p>Cloud Shell ships <code>agy</code>, but the version varies between sessions. Update it so everyone is on the same release:</p>
 <pre><code language="language-bash" class="language-bash">sudo agy update &amp;&amp; agy --version
 </code></pre>
-<p>It needs <code>sudo</code> because the binary lives in <code>/usr/bin</code>, and the unprivileged updater refuses with <code>directory /usr/bin is not fully accessible</code>. Cloud Shell grants passwordless sudo. It takes about twenty seconds, and the download runs on the Cloud Shell VM rather than over your own connection.</p>
-<aside class="warning"><p><strong>This is an every-session step. </strong><code>/usr/bin</code> is on the VM, not the persistent disk, so the update is discarded whenever Cloud Shell recycles. If you reconnect later, run it again — and if anything misbehaves afterwards, check <code>agy --version</code> first.</p>
+<p><code>sudo</code> is needed because the binary lives in <code>/usr/bin</code>; without it the updater refuses with <code>directory /usr/bin is not fully accessible</code>.</p>
+<aside class="warning"><p><strong>Run this every session. </strong><code>/usr/bin</code> is on the VM rather than the persistent disk, so the update is discarded when Cloud Shell recycles.</p>
 </aside>
 <p>On a laptop, install it with <code>brew install --cask antigravity-cli</code>. The command is <strong><code>agy</code></strong>, not <code>antigravity</code>.</p>
 

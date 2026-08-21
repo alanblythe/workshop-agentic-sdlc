@@ -156,24 +156,19 @@ Add both to `~/.bashrc` if you want them to survive a new shell.
 
 {{step "Update agy" 2}}
 
-Cloud Shell ships `agy` already, but the version varies between sessions —
-1.1.9 and 1.1.13 have been seen minutes apart. The workshop runs on the current
-release so everyone is on the same one.
+Cloud Shell ships `agy`, but the version varies between sessions. Update it so
+everyone is on the same release:
 
 ```bash
 sudo agy update && agy --version
 ```
 
-It needs `sudo` because the binary lives in `/usr/bin`, and the unprivileged
-updater refuses with `directory /usr/bin is not fully accessible`. Cloud Shell
-grants passwordless sudo. It takes about twenty seconds, and the download runs
-on the Cloud Shell VM rather than over your own connection.
+`sudo` is needed because the binary lives in `/usr/bin`; without it the updater
+refuses with `directory /usr/bin is not fully accessible`.
 
 {{#aside "negative"}}
-**This is an every-session step.** `/usr/bin` is on the VM, not the
-persistent disk, so the update is discarded whenever Cloud Shell recycles. If
-you reconnect later, run it again — and if anything misbehaves afterwards,
-check `agy --version` first.
+**Run this every session.** `/usr/bin` is on the VM rather than the persistent
+disk, so the update is discarded when Cloud Shell recycles.
 {{/aside}}
 
 {{#codelab}}
