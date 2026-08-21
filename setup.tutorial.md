@@ -159,11 +159,6 @@ terraform version
 A real binary answers `Terraform v1.x.x`. The stub prints installation
 instructions instead, which is exactly what it did before you started.
 
-> **Careful:**
->
-> **This is an every-session step**, like `agy`. The binary lands in `/usr/bin`,
-> which is on the VM rather than the persistent disk.
-
 ## Check gh is logged in
 
 <walkthrough-tutorial-duration duration="1"></walkthrough-tutorial-duration>
