@@ -144,7 +144,7 @@ if have terraform; then
     ok "terraform $TFV (the config needs >= 1.9.0 for cross-variable validation)"
   else
     fail "terraform is on PATH but does not report a version, so it is a stub rather than the real binary. Cloud Shell ships one of these." \
-      'wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list && sudo apt update && sudo apt install -y terraform'
+      'see the Install terraform step of the setup guide, or https://developer.hashicorp.com/terraform/install'
   fi
 fi
 

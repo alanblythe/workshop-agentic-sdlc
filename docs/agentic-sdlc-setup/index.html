@@ -29,7 +29,7 @@
                   feedback-link="https://github.com/alanblythe/workshop-agentic-sdlc/issues">
     
       <google-codelab-step label="Before you begin" duration="1">
-        <p>This prepares <strong>your own Google Cloud project</strong> for the Agentic SDLC workshop. Do it any time before the session — it takes about fifteen minutes, and nothing here competes with the lab for time on the day.</p>
+        <p>This prepares <strong>your own Google Cloud project</strong> for the Agentic SDLC workshop. Do it any time before the session — it takes about twenty minutes, and nothing here competes with the lab for time on the day.</p>
 <p>Nothing you do is reported anywhere. The output is for you.</p>
 <h2 is-upgraded>What you&#39;ll need</h2>
 <ul>
@@ -116,6 +116,25 @@ export AGENT_ENGINE_LOCATION=us-central1
 <aside class="warning"><p><strong>Run this every session. </strong><code>/usr/bin</code> is on the VM rather than the persistent disk, so the update is discarded when Cloud Shell recycles.</p>
 </aside>
 <p>On a laptop, install it with <code>brew install --cask antigravity-cli</code>. The command is <strong><code>agy</code></strong>, not <code>antigravity</code>.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Install terraform" duration="1">
+        <p>Cloud Shell has a <code>terraform</code> on <code>PATH</code>, but it is a stub that prints install instructions and exits 0 — every command appears to succeed while doing nothing, including the apply that provisions your project. Preflight refuses to run against it.</p>
+<pre><code language="language-bash" class="language-bash">wget -O - https://apt.releases.hashicorp.com/gpg \
+  | sudo gpg --yes --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo &#34;deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP &#39;(?&lt;=UBUNTU_CODENAME=).*&#39; /etc/os-release || lsb_release -cs) main&#34; \
+  | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update &amp;&amp; sudo apt install -y terraform
+</code></pre>
+<h2 is-upgraded>Verify your work</h2>
+<pre><code language="language-bash" class="language-bash">terraform version
+</code></pre>
+<p>A real binary answers <code>Terraform v1.x.x</code>. The stub prints installation instructions instead, which is exactly what it did before you started.</p>
+<aside class="warning"><p><strong>This is an every-session step</strong>, like <code>agy</code>. The binary lands in <code>/usr/bin</code>, which is on the VM rather than the persistent disk.</p>
+</aside>
+<p>On a laptop, <code>brew install terraform</code>, or skip this if you already have it.</p>
 
 
       </google-codelab-step>

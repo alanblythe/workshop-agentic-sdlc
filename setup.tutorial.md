@@ -1,14 +1,14 @@
 <!-- Generated from guides/setup.md.hbs by npm run build. Do not edit. -->
 # Agentic SDLC workshop: set up your project
 
-<walkthrough-tutorial-duration duration="17"></walkthrough-tutorial-duration>
+<walkthrough-tutorial-duration duration="18"></walkthrough-tutorial-duration>
 
 ## Before you begin
 
 <walkthrough-tutorial-duration duration="1"></walkthrough-tutorial-duration>
 
 This prepares **your own Google Cloud project** for the Agentic SDLC
-workshop. Do it any time before the session — it takes about fifteen minutes,
+workshop. Do it any time before the session — it takes about twenty minutes,
 and nothing here competes with the lab for time on the day.
 
 Nothing you do is reported anywhere. The output is for you.
@@ -132,6 +132,37 @@ refuses with `directory /usr/bin is not fully accessible`.
 >
 > **Run this every session.** `/usr/bin` is on the VM rather than the persistent
 > disk, so the update is discarded when Cloud Shell recycles.
+
+## Install terraform
+
+<walkthrough-tutorial-duration duration="1"></walkthrough-tutorial-duration>
+
+Cloud Shell has a `terraform` on `PATH`, but it is a stub that prints install
+instructions and exits 0 — every command appears to succeed while doing
+nothing, including the apply that provisions your project. Preflight refuses to
+run against it.
+
+```bash
+wget -O - https://apt.releases.hashicorp.com/gpg \
+  | sudo gpg --yes --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" \
+  | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install -y terraform
+```
+
+### Verify your work
+
+```bash
+terraform version
+```
+
+A real binary answers `Terraform v1.x.x`. The stub prints installation
+instructions instead, which is exactly what it did before you started.
+
+> **Careful:**
+>
+> **This is an every-session step**, like `agy`. The binary lands in `/usr/bin`,
+> which is on the VM rather than the persistent disk.
 
 ## Check gh is logged in
 

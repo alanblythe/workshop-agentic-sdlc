@@ -14,7 +14,7 @@ feedback link: https://github.com/alanblythe/workshop-agentic-sdlc/issues
 Duration: 1
 
 This prepares **your own Google Cloud project** for the Agentic SDLC
-workshop. Do it any time before the session — it takes about fifteen minutes,
+workshop. Do it any time before the session — it takes about twenty minutes,
 and nothing here competes with the lab for time on the day.
 
 Nothing you do is reported anywhere. The output is for you.
@@ -149,6 +149,39 @@ refuses with `directory /usr/bin is not fully accessible`.
 
 On a laptop, install it with `brew install --cask antigravity-cli`. The command
 is **`agy`**, not `antigravity`.
+
+## Install terraform
+
+Duration: 1
+
+Cloud Shell has a `terraform` on `PATH`, but it is a stub that prints install
+instructions and exits 0 — every command appears to succeed while doing
+nothing, including the apply that provisions your project. Preflight refuses to
+run against it.
+
+```bash
+wget -O - https://apt.releases.hashicorp.com/gpg \
+  | sudo gpg --yes --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" \
+  | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install -y terraform
+```
+
+### Verify your work
+
+```bash
+terraform version
+```
+
+A real binary answers `Terraform v1.x.x`. The stub prints installation
+instructions instead, which is exactly what it did before you started.
+
+> aside negative
+>
+> **This is an every-session step**, like `agy`. The binary lands in `/usr/bin`,
+> which is on the VM rather than the persistent disk.
+
+On a laptop, `brew install terraform`, or skip this if you already have it.
 
 ## Check gh is logged in
 
