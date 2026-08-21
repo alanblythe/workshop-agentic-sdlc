@@ -151,7 +151,7 @@ Where a thing runs follows from what it does.
 
 | Party | Runs | Why there |
 | --- | --- | --- |
-| Spec adversary | Local, Antigravity CLI skill | Interactive, high-iteration, ephemeral. A round trip per turn would ruin it |
+| Spec adversary | Local, Antigravity CLI agent | Interactive, high-iteration, ephemeral. A round trip per turn would ruin it |
 | Local coder | Local, Antigravity CLI | Supervised. You approve each turn, so **you** are the contract |
 | Deployed coder | Agent Platform | Unsupervised, and working at the same time as you. **The test** is the contract |
 
@@ -247,27 +247,30 @@ Two distribution mechanisms, because they are two different conversations:
 - **`local-spec-rules`** the attendee writes themselves in about five minutes, a rule from their own team's experience, added to the adversary. That is the
   authoring story: five lines of markdown, no approval, no release.
 
-The published skill declares the seam that makes this deterministic:
+The published agent declares the seam that makes this deterministic:
 
 ```markdown
 ## Local rules
-Before reviewing, check for `skills/local-spec-rules.md`.
-If it exists, read it and apply those rules in addition to the standard set.
+Before reviewing, check for `docs/local-spec-rules.md`.
+If it exists, read it and apply those rules in addition to these.
 ```
 
-The attendee's rule fires because the published skill went looking for it, not
-because a model connected two skills on its own. That is also the governance
+The attendee's rule fires because the published agent went looking for it, not
+because a model connected two files on its own. That is also the governance
 pattern in miniature: a published standard with a documented hook, extended
 without forking.
 
-The skill source lives here in `skills/`, alongside a root `plugin.json` that
-makes this repo installable with `agy plugin install .`. If the plugin install
-fails, the file is already on disk in a repo they cloned a week ago, one copy
-command, and nothing sat in the lab repo's discovery path in the meantime.
+The agent lives here in `agents/`, alongside a root `plugin.json` that makes
+this repo installable with `agy plugin install .`. If the plugin install fails,
+the file is already on disk in a repo they cloned a week ago, one copy command,
+and nothing sat in the lab repo's discovery path in the meantime.
 
-A skill is only its `name` and `description` until something activates it; the
-body is loaded on demand. The description is what earns the invocation, so it
-is written to be matched, not to be read.
+An agent is a persona rather than a capability the model may reach for. It is
+chosen by name, `agy --agent spec-adversary`, and it replaces the ordinary
+assistant for that session, so its rules are not advice it can decide the
+question does not need. A wrong name is silent, though: `agy --agent` runs the
+ordinary agent rather than refusing, which is why the lab looks at `agy agents`
+first.
 
 ## Repos
 
@@ -275,7 +278,7 @@ One rule decides which repo a thing belongs in: **do students fork it?**
 
 | Repo | Students | What it is | Contents |
 | --- | --- | --- | --- |
-| `workshop-agentic-sdlc` | Clone and install from. Never fork | **Preflight and materials** | This README, classroom outline, `guides/` and the `setup.lab.md` / `setup.tutorial.md` it renders, `scripts/preflight.sh`, `terraform/`, `skills/` |
+| `workshop-agentic-sdlc` | Clone and install from. Never fork | **Preflight and materials** | This README, classroom outline, `guides/` and the `setup.lab.md` / `setup.tutorial.md` it renders, `scripts/preflight.sh`, `terraform/`, `agents/` |
 | `workshop-agentic-sdlc-lab` | Fork on the day | **Where the workshop day is spent** | The app, `docs/request.md`, `docs/spec.md`, `coder-agent/`, `scripts/setup-deploy-key.sh`, `lab.lab.md`, the codelab on Pages |
 
 If it is used before the session, it belongs in the first. If the attendee

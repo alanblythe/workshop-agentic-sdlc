@@ -411,8 +411,17 @@ if have agy; then
   else
     warn "spec-adversary is not installed"
   fi
-  # `agy plugin validate` never reads SKILL.md frontmatter, so a broken skill
-  # passes it. It is not used as a gate here.
+  # A name `--agent` does not know is not an error: agy silently runs the
+  # ordinary agent instead, so the lab's persona is confirmed present rather
+  # than assumed. Checked as a file because that is what agy reads agents from
+  # and it needs no login, which `agy plugin validate` would not give us
+  # either: it never reads frontmatter, so a broken component still passes.
+  if [ -f "$HOME/.gemini/config/plugins/spec-adversary/agents/spec-adversary/agent.md" ]; then
+    ok "the spec-adversary agent is registered"
+  else
+    fail "the spec-adversary plugin has no agent in it" \
+      "cd $REPO_ROOT && agy plugin uninstall spec-adversary && agy plugin install ."
+  fi
 fi
 
 # --- 12. terraform ---------------------------------------------------------
