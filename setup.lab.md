@@ -52,6 +52,8 @@ nothing to keep in a second tab, and nothing to alt-tab between.
 
 <button>[Open in Cloud Shell](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/alanblythe/workshop-agentic-sdlc&cloudshell_tutorial=setup.tutorial.md)</button>
 
+![The Cloud Shell editor with this guide open in the Tutorial panel on the right and the terminal along the bottom](docs/images/cloud-shell-tutorial-panel-live.png)
+
 > aside positive
 >
 > Tick **Trust repo** when Cloud Shell asks. It is remembered, and it is what
