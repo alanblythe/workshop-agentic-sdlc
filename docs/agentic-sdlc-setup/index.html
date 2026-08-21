@@ -44,14 +44,14 @@
 <li><code>agy</code> updated and authenticated</li>
 <li>The <code>spec-adversary</code> plugin installed</li>
 </ul>
-<aside class="warning"><p><strong>Do not fork this repository.</strong> You clone it and run preflight from it. On the day you fork a <em>different</em> repository — the lab one — and this distinction matters: forks do not copy issues, and the lab repo stays sealed until kickoff.</p>
+<aside class="warning"><p><strong>Do not fork this repository.</strong> You clone it and run preflight from it. On the day you fork a <em>different</em> repository — the lab one. Forks do not copy issues, and the lab repo stays sealed until kickoff.</p>
 </aside>
 
 
       </google-codelab-step>
     
       <google-codelab-step label="Get the repository" duration="2">
-        <p>The quickest route is Cloud Shell, which already has most of the toolchain. The button clones the repository <em>and</em> opens this guide in a panel beside the shell, so each step sits next to the terminal you are typing it into — nothing to keep in a second tab, and nothing to alt-tab between.</p>
+        <p>The quickest route is Cloud Shell, which already has most of the toolchain. The button clones the repository <em>and</em> opens this guide in a panel beside the shell, so each step sits next to the terminal you are typing it into.</p>
 <p><a href="https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/alanblythe/workshop-agentic-sdlc&cloudshell_tutorial=setup.tutorial.md" target="_blank"><paper-button class="colored" raised>Open in Cloud Shell</paper-button></a></p>
 <p class="image-container"><img alt="The Cloud Shell Tutorial panel, with this guide open in it beside the editor" src="img/c6bb6dddc61b5c07.png"></p>
 <aside class="special"><p>Tick <strong>Trust repo</strong> when Cloud Shell asks. It is remembered, and it is what gives you a normal session with your real home directory rather than an ephemeral one that discards anything you install.</p>
@@ -74,8 +74,8 @@ gcloud config get-value project
 <p>Then authenticate. You need <strong>two</strong> grants here, not one:</p>
 <pre><code language="language-bash" class="language-bash">gcloud auth login --update-adc
 </code></pre>
-<p><code>--update-adc</code> is the part people miss. Application Default Credentials are a separate file from your <code>gcloud</code> login, and Terraform reads only that file — never your <code>gcloud</code> configuration.</p>
-<aside class="warning"><p>If you keep more than one <code>gcloud</code> configuration and switch with <code>CLOUDSDK_CONFIG</code>, note that <strong>Terraform ignores it entirely</strong>. It reads <code>GOOGLE_APPLICATION_CREDENTIALS</code>, then a fixed path. Preflight handles this for you, but it explains an otherwise baffling error that claims your project does not exist.</p>
+<p><code>--update-adc</code> is easy to miss. Application Default Credentials are a separate file from your <code>gcloud</code> login, and Terraform reads only that file — never your <code>gcloud</code> configuration.</p>
+<aside class="warning"><p>If you keep more than one <code>gcloud</code> configuration and switch with <code>CLOUDSDK_CONFIG</code>, note that <strong>Terraform ignores it entirely</strong>. It reads <code>GOOGLE_APPLICATION_CREDENTIALS</code>, then a fixed path. Preflight handles this for you, but it explains an error that claims your project does not exist.</p>
 </aside>
 
 
@@ -100,9 +100,9 @@ gcloud config get-value project
 <pre><code language="language-bash" class="language-bash">export MODEL_LOCATION=global
 export AGENT_ENGINE_LOCATION=us-central1
 </code></pre>
-<aside class="warning"><p><strong>Setting both to the same value is the mistake this stack punishes hardest.</strong> The workshop uses <code>gemini-3.6-flash</code>, and the whole Gemini 3 family is served <em>only</em> from <code>global</code>. A regional endpoint returns a 404 that names the model, so it reads like a typo in the model name rather than a wrong location.</p>
+<aside class="warning"><p><strong>Do not set both to the same value.</strong> The workshop uses <code>gemini-3.6-flash</code>, and the whole Gemini 3 family is served <em>only</em> from <code>global</code>. A regional endpoint returns a 404 that names the model, so it reads like a typo in the model name rather than a wrong location.</p>
 </aside>
-<p>Preflight refuses to run if either is unset, or if the two match. There are no defaults on purpose: a guessed region builds a URL that resolves perfectly well and quietly points somewhere else.</p>
+<p>Preflight refuses to run if either is unset, or if the two match. There are no defaults on purpose: a guessed region builds a URL that resolves, and points somewhere else.</p>
 <p>Add both to <code>~/.bashrc</code> if you want them to survive a new shell.</p>
 
 
@@ -123,13 +123,13 @@ export AGENT_ENGINE_LOCATION=us-central1
       <google-codelab-step label="Authenticate agy" duration="3">
         <p><code>agy</code> has <strong>its own login, separate from </strong></p>
 <p><strong><code>gcloud</code></strong>. Authenticating gcloud does nothing for it — it holds its own OAuth grant with its own scopes. Two logins, not one. There is no <code>agy login</code> subcommand; authentication happens on first use.</p>
-<p>Maximise your terminal first. The login prints a very long URL, and a narrow terminal wraps it across six or more lines, which makes it painful to select.</p>
+<p>Maximise your terminal first. The login prints a very long URL, and a narrow terminal wraps it across six or more lines.</p>
 <pre><code language="language-bash" class="language-bash">agy
 </code></pre>
 <p>You will be asked to open a URL, then to paste back a code. The URL is emitted as a terminal hyperlink, so <strong>try clicking it first</strong>. Approve in the browser, copy the code it shows, paste it into the <code>authorization code...</code> field, press Enter, then leave with <code>/quit</code>.</p>
 <aside class="warning"><p>Use plain <code>agy</code>, <strong>not </strong><code>agy -p</code>. Print mode caps the wait at 60 seconds and then fails with <code>authentication interrupted</code>. The interactive prompt has no timeout — it waits at an input field for as long as you need.</p>
 </aside>
-<p>The browser does not have to be on this machine. The redirect goes to a hosted callback rather than a localhost listener, which is exactly what makes this work in Cloud Shell.</p>
+<p>The browser does not have to be on this machine. The redirect goes to a hosted callback rather than a localhost listener, which is what makes this work in Cloud Shell.</p>
 <h2 is-upgraded>Verify your work</h2>
 <pre><code language="language-bash" class="language-bash">agy -p &#34;Reply with exactly: authenticated&#34;
 </code></pre>

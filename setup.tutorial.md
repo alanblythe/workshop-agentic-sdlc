@@ -31,9 +31,8 @@ Nothing you do is reported anywhere. The output is for you.
 > **Careful:**
 >
 > **Do not fork this repository.** You clone it and run preflight from it. On
-> the day you fork a *different* repository — the lab one — and this
-> distinction matters: forks do not copy issues, and the lab repo stays sealed
-> until kickoff.
+> the day you fork a *different* repository — the lab one. Forks do not copy
+> issues, and the lab repo stays sealed until kickoff.
 
 ## Get the repository
 
@@ -76,7 +75,7 @@ Then authenticate. You need **two** grants here, not one:
 gcloud auth login --update-adc
 ```
 
-`--update-adc` is the part people miss. Application Default Credentials are a
+`--update-adc` is easy to miss. Application Default Credentials are a
 separate file from your `gcloud` login, and Terraform reads only that file —
 never your `gcloud` configuration.
 
@@ -85,8 +84,7 @@ never your `gcloud` configuration.
 > If you keep more than one `gcloud` configuration and switch with
 > `CLOUDSDK_CONFIG`, note that **Terraform ignores it entirely**. It reads
 > `GOOGLE_APPLICATION_CREDENTIALS`, then a fixed path. Preflight handles this
-> for you, but it explains an otherwise baffling error that claims your
-> project does not exist.
+> for you, but it explains an error that claims your project does not exist.
 
 ## Choose your two locations
 
@@ -106,14 +104,13 @@ export AGENT_ENGINE_LOCATION=us-central1
 
 > **Careful:**
 >
-> **Setting both to the same value is the mistake this stack punishes hardest.**
-> The workshop uses `gemini-3.6-flash`, and the whole Gemini 3 family is served
+> **Do not set both to the same value.** The workshop uses `gemini-3.6-flash`, and the whole Gemini 3 family is served
 > *only* from `global`. A regional endpoint returns a 404 that names the model,
 > so it reads like a typo in the model name rather than a wrong location.
 
 Preflight refuses to run if either is unset, or if the two match. There are no
-defaults on purpose: a guessed region builds a URL that resolves perfectly well
-and quietly points somewhere else.
+defaults on purpose: a guessed region builds a URL that
+resolves, and points somewhere else.
 
 Add both to `~/.bashrc` if you want them to survive a new shell.
 
@@ -151,7 +148,7 @@ not one. There is no `agy login` subcommand; authentication happens on first
 use.
 
 Maximise your terminal first. The login prints a very long URL, and a narrow
-terminal wraps it across six or more lines, which makes it painful to select.
+terminal wraps it across six or more lines.
 
 ```bash
 agy
@@ -169,8 +166,8 @@ Enter, then leave with `/quit`.
 > timeout — it waits at an input field for as long as you need.
 
 The browser does not have to be on this machine. The redirect goes to a hosted
-callback rather than a localhost listener, which is exactly what makes this work
-in Cloud Shell.
+callback rather than a localhost listener, which is what makes this work in
+Cloud Shell.
 
 ### Verify your work
 
