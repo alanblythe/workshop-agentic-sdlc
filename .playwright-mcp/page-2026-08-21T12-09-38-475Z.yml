@@ -1,0 +1,91 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - list [ref=e5]:
+      - listitem [ref=e6]:
+        - link "Before you begin" [ref=e7] [cursor=pointer]:
+          - /url: "#0"
+      - listitem [ref=e10]:
+        - link "Get the repository" [ref=e11] [cursor=pointer]:
+          - /url: "#1"
+      - listitem [ref=e14]:
+        - link "Point at your project and authenticate" [ref=e15] [cursor=pointer]:
+          - /url: "#2"
+      - listitem [ref=e18]:
+        - link "Choose your two locations" [ref=e19] [cursor=pointer]:
+          - /url: "#3"
+      - listitem [ref=e22]:
+        - link "Update agy" [ref=e23] [cursor=pointer]:
+          - /url: "#4"
+      - listitem [ref=e26]:
+        - link "Authenticate agy" [ref=e27] [cursor=pointer]:
+          - /url: "#5"
+      - listitem [ref=e30]:
+        - link "Run preflight" [ref=e31] [cursor=pointer]:
+          - /url: "#6"
+      - listitem [ref=e34]:
+        - link "You're ready" [ref=e35] [cursor=pointer]:
+          - /url: "#7"
+    - link "bug_report Report a mistake" [ref=e39] [cursor=pointer]:
+      - /url: https://github.com/alanblythe/workshop-agentic-sdlc/issues
+      - generic [ref=e40]: bug_report
+      - text: Report a mistake
+  - generic [ref=e41]:
+    - link "close" [ref=e43] [cursor=pointer]:
+      - /url: /
+    - heading "Set up your project before the workshop" [level=1] [ref=e45]
+    - generic "Time remaining" [ref=e47]:
+      - generic [ref=e48]: access_time
+      - text: 16 mins remaining
+  - generic [ref=e49]:
+    - generic [ref=e53]:
+      - heading "1. Before you begin" [level=2] [ref=e54]
+      - paragraph [ref=e55]:
+        - text: This prepares
+        - strong [ref=e56]: your own Google Cloud project
+        - text: for the Agentic SDLC workshop. Do it any time before the session — it takes about fifteen minutes, and nothing here competes with the lab for time on the day.
+      - paragraph [ref=e57]: Nothing you do is reported anywhere. The output is for you.
+      - heading "What you'll need" [level=2] [ref=e58]
+      - list [ref=e59]:
+        - listitem [ref=e60]:
+          - text: A Google Cloud project
+          - strong [ref=e61]: with billing enabled
+          - text: ", where you are happy to create billed resources"
+        - listitem [ref=e62]:
+          - text: A GitHub account, and the
+          - code [ref=e63]: gh
+          - text: CLI logged in
+        - listitem [ref=e64]:
+          - text: Either Cloud Shell, or a laptop with
+          - code [ref=e65]: gcloud
+          - text: ","
+          - code [ref=e66]: terraform
+          - text: ","
+          - code [ref=e67]: uv
+          - text: ","
+          - code [ref=e68]: gh
+          - text: and Node installed
+      - heading "What you'll end up with" [level=2] [ref=e69]
+      - list [ref=e70]:
+        - listitem [ref=e71]: The required APIs enabled on your project
+        - listitem [ref=e72]:
+          - text: An
+          - strong [ref=e73]: empty
+          - text: Secret Manager secret, waiting for a deploy key
+        - listitem [ref=e74]:
+          - code [ref=e75]: agy
+          - text: updated and authenticated
+        - listitem [ref=e76]:
+          - text: The
+          - code [ref=e77]: spec-adversary
+          - text: plugin installed
+      - complementary [ref=e78]:
+        - paragraph [ref=e79]:
+          - strong [ref=e80]: Do not fork this repository.
+          - text: You clone it and run preflight from it. On the day you fork a
+          - emphasis [ref=e81]: different
+          - text: "repository — the lab one — and this distinction matters: forks do not copy issues, and the lab repo stays sealed until kickoff."
+    - generic [ref=e83]:
+      - link "Back":
+        - /url: "#"
+      - link "Next" [ref=e85] [cursor=pointer]:
+        - /url: "#"
