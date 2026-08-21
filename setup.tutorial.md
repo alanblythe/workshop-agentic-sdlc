@@ -193,8 +193,20 @@ nothing for it — it holds its own OAuth grant with its own scopes. Two logins,
 not one. There is no `agy login` subcommand; authentication happens on first
 use.
 
+Two ways to get a URL you can click. Either works — the first keeps you in this
+terminal, the second needs no widening.
+
+**Here**, widen the terminal for the duration of the login:
+
 ```bash
 COLS=$(tput cols); stty cols 2000; agy; stty cols "$COLS"
+```
+
+**Or in the editor's terminal** — **View → Terminal**, or `` Ctrl+` `` — where a
+click opens the whole link as it is:
+
+```bash
+agy
 ```
 
 You will be asked to open a URL, then to paste back a code. Click the URL,
@@ -203,13 +215,17 @@ approve in the browser, copy the code it shows, paste it into the
 
 > **Tip:**
 >
-> `stty cols 2000` is what makes that URL clickable. `agy` wraps it to the width
-> the terminal reports, and a hard wrap leaves one fragment per line — clicking a
-> fragment sends an incomplete URL, and Google answers `Error 400 (Bad Request)`,
-> `invalid_request`. A reported width past the end of the URL keeps it on one
-> line. The real width is captured first and set back afterwards, because nothing
-> else restores it — `stty sane` resets the line discipline and leaves the size
-> alone.
+> `agy` wraps the URL to the width the terminal reports, and the wrap is hard, so
+> each line is a separate fragment. Clicking one sends an incomplete URL and
+> Google answers `Error 400 (Bad Request)`, `invalid_request`. Reporting a width
+> past the end of the URL removes the reason to wrap; the editor's terminal
+> instead reads the hyperlink the escape codes carry, so the wrap does not matter
+> there. The real width is captured and set back afterwards because nothing else
+> restores it — `stty sane` resets the line discipline and leaves the size alone.
+
+If you use the editor's terminal, come back to the one below afterwards. The
+terminal icon on each command block sends to that one, not to a terminal you
+opened yourself.
 
 The browser does not have to be on this machine. The redirect goes to a hosted
 callback rather than a localhost listener, which is what makes this work in
