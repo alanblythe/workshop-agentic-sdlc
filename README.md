@@ -274,10 +274,14 @@ is written to be matched, not to be read.
 
 One rule decides which repo a thing belongs in: **do students fork it?**
 
-| Repo | Students | Contents |
-| --- | --- | --- |
-| `workshop-agentic-sdlc` | Clone and install from. Never fork | This README, classroom outline, `preflight.sh`, `terraform/`, `skills/` |
-| `workshop-agentic-sdlc-lab` | Fork on the day | The app, `docs/spec.md`, `docs/request.md`, `lab.lab.md`, the generated codelab on Pages |
+| Repo | Students | What it is | Contents |
+| --- | --- | --- | --- |
+| `workshop-agentic-sdlc` | Clone and install from. Never fork | **Preflight and materials** | This README, classroom outline, `setup.lab.md`, `scripts/preflight.sh`, `terraform/`, `skills/` |
+| `workshop-agentic-sdlc-lab` | Fork on the day | **Where the workshop day is spent** | The app, `docs/request.md`, `docs/spec.md`, `coder-agent/`, `lab.lab.md`, the codelab on Pages |
+
+If it is used before the session, it belongs in the first. If the attendee
+touches it during the session, it belongs in the second — which is why the
+deployed agent lives in the lab repo rather than beside the Terraform.
 
 The lab repo opens at kickoff. The rubric and the walkthrough are where the
 lab's discoveries live, and a student who read them last week does not get to
