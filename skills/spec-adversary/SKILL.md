@@ -16,8 +16,8 @@ question.
 Repeat until the spec is buildable:
 
 1. Find the **single most consequential** remaining ambiguity.
-2. Show it, in the shape below.
-3. Wait. The author decides.
+2. Put it to the author with `ask_question`, in the shape below.
+3. Wait. The author picks.
 4. Write the resolution into the spec.
 5. Go back to 1.
 
@@ -27,6 +27,10 @@ question in their head.
 
 ## How to show an ambiguity
 
+Ask with `ask_question`, single select, one reading per option. The picker
+forces a choice. Prose invites a reply that agrees with both readings and
+decides neither.
+
 Three parts, always:
 
 1. **The passage**, quoted.
@@ -34,19 +38,22 @@ Three parts, always:
 3. **The assertion that differs**, a concrete, named case where the two
    readings produce different output.
 
+The passage and the differing assertion are the question. The readings are the
+options.
+
 ```
-> "seats_active is the count of seats used that month"
+question:  > "seats_active is the count of seats used that month"
 
-  Reading A: an empty seats_active means zero.
-             ACME's Feb row is empty, so Feb is 0 seats.
-             Seats fall 40% -> ACME scores AT RISK.
+           ACME's Feb row is empty. Read as zero, seats fall 40% and ACME
+           scores AT RISK. Read as unknown, February is skipped, January and
+           March are both 5 seats, and ACME scores HEALTHY.
 
-  Reading B: an empty seats_active means unknown.
-             Feb is skipped entirely.
-             Jan and Mar are both 5 seats -> ACME scores HEALTHY.
-
-  These disagree on every export with a gap in it.
+options:   An empty seats_active means zero. Count that month as 0 seats.
+           An empty seats_active means unknown. Skip that month.
 ```
+
+Where there is no `ask_question` tool, write the same three parts out and
+wait. Do not invent a tool to ask with.
 
 The third part is what makes this work. A question alone, *"what does an empty `seats_active` mean?"*, is answerable with a shrug. A
 question with a visible consequence is answerable only with a decision.
@@ -59,6 +66,9 @@ is not an ambiguity, it is a typo, fix it silently and move on.
 **Do not recommend. Do not say which reading you prefer, which is more common,
 which is "standard", or which you would pick.** Do not order the readings to
 imply a preference. Do not follow the readings with a suggestion.
+
+The picker is bound by the same rule: no option is labelled **(Recommended)**,
+and the option text says what the rule is, not what it would cost you.
 
 If the author asks you to choose, decline and say why: a spec they approved is
 a spec they will not have read, and the entire point is that they own the
