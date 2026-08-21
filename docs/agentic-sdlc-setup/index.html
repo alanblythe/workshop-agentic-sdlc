@@ -137,6 +137,20 @@ export AGENT_ENGINE_LOCATION=us-central1
 
       </google-codelab-step>
     
+      <google-codelab-step label="Check gh is logged in" duration="1">
+        <p>On the day you fork the lab repository and add a deploy key to it, both through <code>gh</code>. Cloud Shell ships <code>gh</code> but does not sign you in.</p>
+<pre><code language="language-bash" class="language-bash">gh auth status
+</code></pre>
+<p>If that reports you are not logged in:</p>
+<pre><code language="language-bash" class="language-bash">gh auth login
+</code></pre>
+<p>Choose GitHub.com, then HTTPS, then authenticating with a browser. <code>gh</code> prints a short one-time code and a <code>github.com/login/device</code> URL to enter it at.</p>
+<aside class="special"><p>Preflight checks this as well, but it runs to the end before reporting — including the Terraform apply. Fixing it here saves that wait.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
       <google-codelab-step label="Run preflight" duration="3">
         <p>This checks everything above, then provisions your project.</p>
 <p>Look first if you like — with <code>--plan-only</code> it changes nothing at all:</p>

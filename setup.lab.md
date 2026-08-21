@@ -188,6 +188,31 @@ agy -p "Reply with exactly: authenticated"
 Answering without prompting for a URL means the grant is in place. Unlike the
 binary, it lives under `~/.gemini` and does survive a session recycle.
 
+## Check gh is logged in
+
+Duration: 1
+
+On the day you fork the lab repository and add a deploy key to it, both through
+`gh`. Cloud Shell ships `gh` but does not sign you in.
+
+```bash
+gh auth status
+```
+
+If that reports you are not logged in:
+
+```bash
+gh auth login
+```
+
+Choose GitHub.com, then HTTPS, then authenticating with a browser. `gh` prints
+a short one-time code and a `github.com/login/device` URL to enter it at.
+
+> aside positive
+>
+> Preflight checks this as well, but it runs to the end before reporting —
+> including the Terraform apply. Fixing it here saves that wait.
+
 ## Run preflight
 
 Duration: 3
