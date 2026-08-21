@@ -154,10 +154,10 @@ sudo apt update &amp;&amp; sudo apt install -y terraform
       <google-codelab-step label="Authenticate agy" duration="3">
         <p><code>agy</code> has <strong>its own login, separate from </strong></p>
 <p><strong><code>gcloud</code></strong>. Authenticating gcloud does nothing for it — it holds its own OAuth grant with its own scopes. Two logins, not one. There is no <code>agy login</code> subcommand; authentication happens on first use.</p>
-<pre><code language="language-bash" class="language-bash">stty cols 2000; agy; stty sane
+<pre><code language="language-bash" class="language-bash">COLS=$(tput cols); stty cols 2000; agy; stty cols &#34;$COLS&#34;
 </code></pre>
 <p>You will be asked to open a URL, then to paste back a code. Click the URL, approve in the browser, copy the code it shows, paste it into the <code>authorization code...</code> field, press Enter, then leave with <code>/quit</code>.</p>
-<aside class="special"><p><code>stty cols 2000</code> is what makes that URL clickable. <code>agy</code> wraps it to the width the terminal reports, and a hard wrap leaves one fragment per line — clicking a fragment sends an incomplete URL, and Google answers <code>Error 400 (Bad Request)</code>, <code>invalid_request</code>. A reported width past the end of the URL keeps it on one line. <code>stty sane</code> puts the width back.</p>
+<aside class="special"><p><code>stty cols 2000</code> is what makes that URL clickable. <code>agy</code> wraps it to the width the terminal reports, and a hard wrap leaves one fragment per line — clicking a fragment sends an incomplete URL, and Google answers <code>Error 400 (Bad Request)</code>, <code>invalid_request</code>. A reported width past the end of the URL keeps it on one line. The real width is captured first and set back afterwards, because nothing else restores it — <code>stty sane</code> resets the line discipline and leaves the size alone.</p>
 </aside>
 <p>The browser does not have to be on this machine. The redirect goes to a hosted callback rather than a localhost listener, which is what makes this work in Cloud Shell.</p>
 <h2 is-upgraded>Verify your work</h2>

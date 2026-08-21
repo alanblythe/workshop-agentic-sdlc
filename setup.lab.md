@@ -213,7 +213,7 @@ not one. There is no `agy login` subcommand; authentication happens on first
 use.
 
 ```bash
-stty cols 2000; agy; stty sane
+COLS=$(tput cols); stty cols 2000; agy; stty cols "$COLS"
 ```
 
 You will be asked to open a URL, then to paste back a code. Click the URL,
@@ -226,7 +226,9 @@ approve in the browser, copy the code it shows, paste it into the
 > the terminal reports, and a hard wrap leaves one fragment per line — clicking a
 > fragment sends an incomplete URL, and Google answers `Error 400 (Bad Request)`,
 > `invalid_request`. A reported width past the end of the URL keeps it on one
-> line. `stty sane` puts the width back.
+> line. The real width is captured first and set back afterwards, because nothing
+> else restores it — `stty sane` resets the line discipline and leaves the size
+> alone.
 
 The browser does not have to be on this machine. The redirect goes to a hosted
 callback rather than a localhost listener, which is what makes this work in
