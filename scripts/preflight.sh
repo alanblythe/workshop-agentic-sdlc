@@ -43,11 +43,12 @@ esac
 FAILED=0
 FIXES=""
 BLOCKERS=0
+SKILL_DIRS="$HOME/.gemini/config/skills $HOME/.gemini/antigravity-cli/skills"
 
 if [ -t 1 ]; then B=$(printf '\033[1m'); R=$(printf '\033[0m'); RED=$(printf '\033[31m'); GRN=$(printf '\033[32m'); YEL=$(printf '\033[33m')
 else B=""; R=""; RED=""; GRN=""; YEL=""; fi
 
-section() { printf '\n%s== %s ==%s\n' "$B" "$1" "$R"; }
+section() { printf '%s== %s ==%s\n' "$B" "$1" "$R"; }
 ok()      { printf '  %sok%s    %s\n' "$GRN" "$R" "$1"; }
 info()    { printf '  --    %s\n' "$1"; }
 warn()    { printf '  %swarn%s  %s\n' "$YEL" "$R" "$1"; }
@@ -94,7 +95,7 @@ else
   case "$AGENT_ENGINE_LOCATION" in
     global) blocker "AGENT_ENGINE_LOCATION is 'global', which is a model endpoint, not a region. Interpolated into a host it gives global-aiplatform.googleapis.com, which does not resolve." \
               'export AGENT_ENGINE_LOCATION=us-central1' ;;
-    *-*[0-9]) ok "AGENT_ENGINE_LOCATION=$AGENT_ENGINE_LOCATION" ;;
+    *-*[0-9]) ;;
     *) blocker "AGENT_ENGINE_LOCATION='$AGENT_ENGINE_LOCATION' is not a region" 'export AGENT_ENGINE_LOCATION=us-central1' ;;
   esac
 fi
@@ -102,7 +103,7 @@ fi
 if [ -z "${MODEL_LOCATION:-}" ]; then
   blocker "MODEL_LOCATION is not set" 'export MODEL_LOCATION=global'
 else
-  ok "MODEL_LOCATION=$MODEL_LOCATION"
+  ok "MODEL_LOCATION=$MODEL_LOCATION  AGENT_ENGINE_LOCATION=$AGENT_ENGINE_LOCATION"
 fi
 
 if [ -n "${MODEL_LOCATION:-}" ] && [ "${MODEL_LOCATION:-}" = "${AGENT_ENGINE_LOCATION:-}" ]; then
@@ -123,8 +124,10 @@ fi
 # --- 2. toolchain ----------------------------------------------------------
 section "toolchain"
 
+# One line for everything present; only what is missing gets its own.
+TOOLS_OK=""
 check_tool() { # name, install command, note
-  if have "$1"; then ok "$1 — $(command -v "$1")"; else fail "$1 is not installed${3:+ ($3)}" "$2"; fi
+  if have "$1"; then TOOLS_OK="$TOOLS_OK $1"; else fail "$1 is not installed${3:+ ($3)}" "$2"; fi
 }
 check_tool gcloud    'https://cloud.google.com/sdk/docs/install'
 check_tool terraform 'brew install terraform    # or https://developer.hashicorp.com/terraform/install'
@@ -133,6 +136,7 @@ check_tool gh        'brew install gh    # or https://cli.github.com'
 check_tool npx       'install Node.js — https://nodejs.org (Cloud Shell has it already)'
 # The binary is agy. `antigravity` is the IDE cask, not this.
 check_tool agy       'brew install --cask antigravity-cli    # the command is agy, not antigravity'
+[ -n "$TOOLS_OK" ] && ok "present:$TOOLS_OK"
 
 # Being on PATH is not the same as being installed. Cloud Shell ships a stub
 # that prints install instructions and exits 0, so every terraform command
@@ -179,15 +183,11 @@ if have gcloud; then
   ACCOUNT=$(gcloud config get-value account 2>/dev/null)
   if [ -z "$ACCOUNT" ] || [ "$ACCOUNT" = "(unset)" ]; then
     blocker "gcloud is not authenticated" 'gcloud auth login'
-  else
-    ok "account: $ACCOUNT"
   fi
 
   PROJECT=$(gcloud config get-value project 2>/dev/null)
   if [ -z "$PROJECT" ] || [ "$PROJECT" = "(unset)" ]; then
     blocker "no active gcloud project" 'gcloud config set project YOUR_PROJECT_ID'
-  else
-    ok "project: $PROJECT"
   fi
 
   if [ -n "${PROJECT:-}" ] && [ "$PROJECT" != "(unset)" ]; then
@@ -196,10 +196,9 @@ if have gcloud; then
       blocker "cannot read project '$PROJECT' — wrong id, or your account has no access to it" \
         "gcloud projects describe $PROJECT"
     else
-      ok "project number: $PROJECT_NUMBER"
       BILLED=$(gcloud beta billing projects describe "$PROJECT" --format='value(billingEnabled)' 2>/dev/null)
       if [ "$BILLED" = "True" ]; then
-        ok "billing is linked"
+        ok "$ACCOUNT on $PROJECT ($PROJECT_NUMBER), billing linked"
       else
         blocker "billing is not linked to $PROJECT. The Agent Platform APIs refuse with 403 BILLING_DISABLED, which does not mention billing in the call that fails." \
           "gcloud beta billing projects link $PROJECT --billing-account=YOUR_BILLING_ACCOUNT_ID"
@@ -370,7 +369,6 @@ if have uv; then
   fi
 
   if have agents-cli; then
-    SKILL_DIRS="$HOME/.gemini/config/skills $HOME/.gemini/antigravity-cli/skills"
     FOUND=""
     for d in $SKILL_DIRS; do
       [ -d "$d" ] && [ -n "$(ls -A "$d" 2>/dev/null)" ] && FOUND="$d"
@@ -472,5 +470,50 @@ else
 $(tail -15 /tmp/preflight-tf.log | sed 's/^/      /')" \
     "terraform -chdir=$TF_DIR apply $TF_VARS"
 fi
+
+# --- 13. verification, against the finished state --------------------------
+# Everything above both checks and fixes, so a problem it reported may already
+# have been solved further down -- an API that was off when the run started is
+# on by the end, but the 403 it caused is still on the report. This pass runs
+# after the work and owns the verdict, so what you are told is the state you
+# are actually in.
+section "checking"
+
+FAILED=0
+FIXES=""
+
+MISSING=""
+ENABLED=$(gcloud services list --enabled --project="$PROJECT" --format='value(config.name)' 2>/dev/null)
+for api in $REQUIRED_APIS; do
+  printf '%s\n' "$ENABLED" | grep -qx "$api" || MISSING="$MISSING $api"
+done
+[ -z "$MISSING" ] && ok "all $(echo "$REQUIRED_APIS" | wc -w | tr -d ' ') APIs enabled" \
+  || fail "still not enabled:$MISSING" "gcloud services enable$MISSING --project=$PROJECT"
+
+CODE=$(curl -sS --max-time 60 -o /dev/null -w '%{http_code}' \
+  -H "Authorization: Bearer $(gcloud auth print-access-token 2>/dev/null)" \
+  -H "Content-Type: application/json" \
+  "https://${MODEL_HOST}/v1/projects/${PROJECT}/locations/${MODEL_LOCATION}/publishers/google/models/${MODEL}:generateContent" \
+  -d '{"contents":[{"role":"user","parts":[{"text":"reply with the single word: ready"}]}]}' 2>/dev/null)
+[ "$CODE" = "200" ] && ok "$MODEL answers from $MODEL_LOCATION" \
+  || fail "$MODEL still not answering (http ${CODE:-none}) — a freshly enabled API can take a minute" \
+       "bash scripts/preflight.sh"
+
+gcloud secrets describe "$SECRET_ID" --project="$PROJECT" >/dev/null 2>&1 \
+  && ok "secret $SECRET_ID exists, empty until the day" \
+  || fail "secret $SECRET_ID was not created" "bash scripts/preflight.sh"
+
+gh auth status >/dev/null 2>&1 && ok "gh is authenticated" \
+  || fail "gh is not authenticated" 'gh auth login'
+
+FOUND=""
+for d in $SKILL_DIRS; do
+  [ -d "$d" ] && [ -n "$(ls -A "$d" 2>/dev/null)" ] && FOUND="$d"
+done
+[ -n "$FOUND" ] && ok "ADK skills present" || fail "ADK skills are not installed" 'agents-cli setup --agent antigravity'
+
+agy plugin list 2>/dev/null | grep -q 'spec-adversary' \
+  && ok "spec-adversary installed" \
+  || fail "spec-adversary is not installed" "cd $REPO_ROOT && agy plugin install ."
 
 report_and_exit
