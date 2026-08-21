@@ -255,6 +255,24 @@ agy -p "Reply with exactly: authenticated"
 Answering without prompting for a URL means the grant is in place. Unlike the
 binary, it lives under `~/.gemini` and does survive a session recycle.
 
+## Let Terraform read your project
+
+Duration: 1
+
+Preflight's Terraform turns on every API this workshop needs — except the one
+it needs in order to read the project at all. Turn that one on yourself:
+
+```bash
+gcloud services enable cloudresourcemanager.googleapis.com
+```
+
+> aside negative
+>
+> Skip this and `terraform plan` prints a plan that looks fine, then fails with
+> `Error 403: Cloud Resource Manager API has not been used in project ... before
+> or it is disabled`. The plan is not the problem; Terraform could not read the
+> project to begin with.
+
 ## Run preflight
 
 Duration: 3

@@ -173,6 +173,16 @@ sudo apt update &amp;&amp; sudo apt install -y terraform
 
       </google-codelab-step>
     
+      <google-codelab-step label="Let Terraform read your project" duration="1">
+        <p>Preflight&#39;s Terraform turns on every API this workshop needs — except the one it needs in order to read the project at all. Turn that one on yourself:</p>
+<pre><code language="language-bash" class="language-bash">gcloud services enable cloudresourcemanager.googleapis.com
+</code></pre>
+<aside class="warning"><p>Skip this and <code>terraform plan</code> prints a plan that looks fine, then fails with <code>Error 403: Cloud Resource Manager API has not been used in project ... before or it is disabled</code>. The plan is not the problem; Terraform could not read the project to begin with.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
       <google-codelab-step label="Run preflight" duration="3">
         <p>This checks everything above, then provisions your project.</p>
 <p>Look first if you like — with <code>--plan-only</code> it changes nothing at all:</p>

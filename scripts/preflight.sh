@@ -258,7 +258,9 @@ else
   # Not fatal: terraform enables them. Enabling here first makes the apply faster
   # and the failure legible if the account cannot enable services.
   warn "not yet enabled:$MISSING"
-  info "Terraform will enable these; run the command below first if the apply fails on permissions"
+  # cloudresourcemanager is the exception: Terraform reads the project through
+  # it before it creates anything, so it cannot be the thing that enables it.
+  info "Terraform enables these itself, except cloudresourcemanager.googleapis.com, which it needs before it can read the project"
   info "gcloud services enable$MISSING --project=$PROJECT"
 fi
 
