@@ -128,8 +128,6 @@ export AGENT_ENGINE_LOCATION=us-central1
 <p>You will be asked to open a URL, then to paste back a code. Click the URL, approve in the browser, copy the code it shows, paste it into the <code>authorization code...</code> field, press Enter, then leave with <code>/quit</code>.</p>
 <aside class="special"><p><code>stty cols 2000</code> is what makes that URL clickable. <code>agy</code> wraps it to the width the terminal reports, and a hard wrap leaves one fragment per line — clicking a fragment sends an incomplete URL, and Google answers <code>Error 400 (Bad Request)</code>, <code>invalid_request</code>. A reported width past the end of the URL keeps it on one line. <code>stty sane</code> puts the width back.</p>
 </aside>
-<aside class="warning"><p>Use plain <code>agy</code>, <strong>not </strong><code>agy -p</code>. Print mode caps the wait at 60 seconds and then fails with <code>authentication interrupted</code>. The interactive prompt has no timeout — it waits at an input field for as long as you need.</p>
-</aside>
 <p>The browser does not have to be on this machine. The redirect goes to a hosted callback rather than a localhost listener, which is what makes this work in Cloud Shell.</p>
 <h2 is-upgraded>Verify your work</h2>
 <pre><code language="language-bash" class="language-bash">agy -p &#34;Reply with exactly: authenticated&#34;

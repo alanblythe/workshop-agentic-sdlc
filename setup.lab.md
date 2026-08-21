@@ -175,12 +175,6 @@ approve in the browser, copy the code it shows, paste it into the
 > `invalid_request`. A reported width past the end of the URL keeps it on one
 > line. `stty sane` puts the width back.
 
-> aside negative
->
-> Use plain `agy`, **not** `agy -p`. Print mode caps the wait at 60 seconds and
-> then fails with `authentication interrupted`. The interactive prompt has no
-> timeout — it waits at an input field for as long as you need.
-
 The browser does not have to be on this machine. The redirect goes to a hosted
 callback rather than a localhost listener, which is what makes this work in
 Cloud Shell.
