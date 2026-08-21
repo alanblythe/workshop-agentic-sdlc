@@ -277,7 +277,7 @@ One rule decides which repo a thing belongs in: **do students fork it?**
 | Repo | Students | What it is | Contents |
 | --- | --- | --- | --- |
 | `workshop-agentic-sdlc` | Clone and install from. Never fork | **Preflight and materials** | This README, classroom outline, `setup.lab.md`, `scripts/preflight.sh`, `terraform/`, `skills/` |
-| `workshop-agentic-sdlc-lab` | Fork on the day | **Where the workshop day is spent** | The app, `docs/request.md`, `docs/spec.md`, `coder-agent/`, `lab.lab.md`, the codelab on Pages |
+| `workshop-agentic-sdlc-lab` | Fork on the day | **Where the workshop day is spent** | The app, `docs/request.md`, `docs/spec.md`, `coder-agent/`, `scripts/setup-deploy-key.sh`, `lab.lab.md`, the codelab on Pages |
 
 If it is used before the session, it belongs in the first. If the attendee
 touches it during the session, it belongs in the second — which is why the
