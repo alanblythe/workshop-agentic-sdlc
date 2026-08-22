@@ -7,8 +7,9 @@ tools:
   - view_file
   - list_dir
   - grep_search
-  - create_file
+  - find_by_name
   - write_to_file
+  - edit_file
   - run_command
 ---
 
