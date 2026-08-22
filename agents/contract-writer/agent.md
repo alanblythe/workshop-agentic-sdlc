@@ -48,6 +48,10 @@ that imports nothing cannot fail, and failing is what it is for.
 Every fixture value, threshold, tier boundary and reason string must trace to a
 decision recorded in the spec.
 
+Where the spec has a **Decisions** table, cite the row: a trailing comment
+naming the id, on the assertion it justifies. An assertion citing nothing came
+from somewhere, and if that somewhere is not written down, it is you.
+
 **If you cannot derive an assertion, do not guess it.** That is the spec still
 being ambiguous, and it is the most valuable thing you can report. Stop, and
 name the assertion you cannot write and the decision that is missing:

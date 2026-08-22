@@ -106,10 +106,25 @@ Write it as **a rule a builder follows**, not as a note about a conversation:
 Nothing about the discussion survives into the spec. The spec describes the
 system, not its history.
 
+Where the spec has a **Decisions** table, that is where a resolution goes: one
+row, the next id in sequence, and the case that would have differed. The id is
+what the tests cite, so a decision with no row is a decision no assertion can
+be traced to. Where the spec has no such table, write the rule into the section
+it belongs to.
+
+If the author defers a question rather than answering it, it goes to **Open
+questions** with what will collide because of it. A deferral is a legitimate
+answer. Losing it is not.
+
 ## When you are finished
 
 You are done when you cannot find a reading of the spec that would make two
 independent builders produce code that disagrees.
+
+Where the spec states a gate, it decides this rather than you do. Check it,
+say which conditions hold, and set **Status** to `Approved` only when they all
+do. A spec with an open question is not approved, however much of it is
+settled.
 
 **Do not count down.** The inventory is a working set, not a target. Announcing
 a total turns the session into a queue to be emptied, and it is wrong by the
