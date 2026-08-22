@@ -241,9 +241,10 @@ repository by construction.
 
 Two distribution mechanisms, because they are two different conversations:
 
-- The **`agentic-sdlc`** plugin, carrying the `contract-writer` subagent, is
-  installed from this repo, which students install from and never fork. That is the governance story: a platform team publishes a
-  vetted standard.
+- The **`agentic-sdlc`** plugin is installed from this repo, which students
+  install from and never fork. It currently carries no components: the
+  `contract-writer` subagent it used to hold is being tried as a workspace
+  agent in the lab repo instead.
 - **`local-spec-rules`** the attendee writes themselves in about five minutes, a rule from their own team's experience, added to the adversary. That is the
   authoring story: five lines of markdown, no approval, no release.
 
@@ -267,16 +268,18 @@ discover a skill sitting in a working directory, measured: `.agents/skills/`,
 `.gemini/skills/`, `skills/` and `.claude/skills/` under the workspace all load
 nothing, so being in the repo is not enough and the install is not optional.
 
-The `contract-writer` subagent stays here, in `agents/`, alongside a root
-`plugin.json` that makes this repo installable with `agy plugin install .`.
-Agents are not workspace-discoverable either, and this one is not the attendee's
-to edit.
+A root `plugin.json` makes this repo installable with `agy plugin install .`.
+
+The `contract-writer` subagent lives in the lab repo at
+`.agents/agents/contract-writer/`, where the attendee forks it. Whether a
+workspace agent is discovered at all is the open question that put it there:
+the documentation says it is, and `agy agents` lists nothing for it.
 
 A skill is only its `name` and `description` until something activates it; the
 body is loaded on demand. The description is what earns the invocation, so it
 is written to be matched, not to be read.
 
-Beside it, in `agents/`, is the **`contract-writer`** subagent. Writing the
+Beside it in the lab repo is the **`contract-writer`** subagent. Writing the
 tests is a different job from interrogating the spec, and the adversary kept
 sliding from the first into the second, because a skill is guidance the model
 can decide the moment has moved past. A subagent cannot: its instructions are
