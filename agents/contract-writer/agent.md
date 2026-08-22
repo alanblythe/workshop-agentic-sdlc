@@ -9,7 +9,8 @@ tools:
   - grep_search
   - find_by_name
   - write_to_file
-  - edit_file
+  - replace_file_content
+  - multi_replace_file_content
   - run_command
 ---
 
