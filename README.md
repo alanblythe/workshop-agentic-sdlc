@@ -241,9 +241,8 @@ repository by construction.
 
 Two distribution mechanisms, because they are two different conversations:
 
-- The **`agentic-sdlc`** plugin, carrying the adversary and the contract
-  writer, is installed from this repo, which students install from and never
-  fork. That is the governance story: a platform team publishes a
+- The **`agentic-sdlc`** plugin, carrying the `contract-writer` subagent, is
+  installed from this repo, which students install from and never fork. That is the governance story: a platform team publishes a
   vetted standard.
 - **`local-spec-rules`** the attendee writes themselves in about five minutes, a rule from their own team's experience, added to the adversary. That is the
   authoring story: five lines of markdown, no approval, no release.
@@ -261,10 +260,17 @@ because a model connected two files on its own. That is also the governance
 pattern in miniature: a published standard with a documented hook, extended
 without forking.
 
-The skill lives here in `skills/`, alongside a root `plugin.json` that makes
-this repo installable with `agy plugin install .`. If the plugin install fails,
-the file is already on disk in a repo they cloned a week ago, one copy command,
-and nothing sat in the lab repo's discovery path in the meantime.
+The adversary skill ships in the **lab** repo, the one they fork, and the lab
+installs it from the clone at step 5. It is there so an attendee can read the
+rules they are about to be refused by, and change them at the end. agy does not
+discover a skill sitting in a working directory, measured: `.agents/skills/`,
+`.gemini/skills/`, `skills/` and `.claude/skills/` under the workspace all load
+nothing, so being in the repo is not enough and the install is not optional.
+
+The `contract-writer` subagent stays here, in `agents/`, alongside a root
+`plugin.json` that makes this repo installable with `agy plugin install .`.
+Agents are not workspace-discoverable either, and this one is not the attendee's
+to edit.
 
 A skill is only its `name` and `description` until something activates it; the
 body is loaded on demand. The description is what earns the invocation, so it
@@ -283,7 +289,7 @@ One rule decides which repo a thing belongs in: **do students fork it?**
 
 | Repo | Students | What it is | Contents |
 | --- | --- | --- | --- |
-| `workshop-agentic-sdlc` | Clone and install from. Never fork | **Preflight and materials** | This README, classroom outline, `guides/` and the `setup.lab.md` / `setup.tutorial.md` it renders, `scripts/preflight.sh`, `terraform/`, `skills/`, `agents/` |
+| `workshop-agentic-sdlc` | Clone and install from. Never fork | **Preflight and materials** | This README, classroom outline, `guides/` and the `setup.lab.md` / `setup.tutorial.md` it renders, `scripts/preflight.sh`, `terraform/`, `agents/` |
 | `workshop-agentic-sdlc-lab` | Fork on the day | **Where the workshop day is spent** | The app, `docs/request.md`, `docs/spec.md`, `coder-agent/`, `scripts/setup-deploy-key.sh`, `lab.lab.md`, the codelab on Pages |
 
 If it is used before the session, it belongs in the first. If the attendee

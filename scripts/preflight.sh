@@ -411,17 +411,15 @@ if have agy; then
   else
     warn "agentic-sdlc is not installed"
   fi
-  # The plugin carries two components and the install reports a count, not
-  # which ones, so both are checked. Checked as files because that is what agy
-  # reads them from and it needs no login; `agy plugin validate` would not help
+  # The install reports a count, not which components landed, so the one that
+  # matters is checked directly. Checked as a file because that is what agy
+  # reads it from and it needs no login; `agy plugin validate` would not help
   # either, since it never reads frontmatter and a broken component still
   # passes it.
-  PLUGIN_DIR="$HOME/.gemini/config/plugins/agentic-sdlc"
-  if [ -f "$PLUGIN_DIR/skills/spec-adversary/SKILL.md" ] \
-     && [ -f "$PLUGIN_DIR/agents/contract-writer/agent.md" ]; then
-    ok "the spec-adversary skill and the contract-writer subagent are installed"
+  if [ -f "$HOME/.gemini/config/plugins/agentic-sdlc/agents/contract-writer/agent.md" ]; then
+    ok "the contract-writer subagent is installed"
   else
-    fail "the plugin is missing a component" \
+    fail "the plugin has no contract-writer subagent in it" \
       "cd $REPO_ROOT && agy plugin uninstall agentic-sdlc && agy plugin install ."
   fi
 fi
