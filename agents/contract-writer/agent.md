@@ -2,6 +2,7 @@
 name: contract-writer
 description: Turns a resolved spec into contract tests, one file per half plus an integration test, deriving every assertion from a decision in the spec and writing no implementation. Use once a spec has been interrogated and the author asks for the tests.
 subagent: true
+commandExecutionPolicy: auto
 ---
 
 # Contract writer
