@@ -416,7 +416,13 @@ if have agy; then
   # reads it from and it needs no login; `agy plugin validate` would not help
   # either, since it never reads frontmatter and a broken component still
   # passes it.
-  if [ -f "$HOME/.gemini/config/plugins/agentic-sdlc/agents/contract-writer/agent.md" ]; then
+  # Two staging roots are documented across versions and only one exists on any
+  # given install, so both are looked in rather than one being assumed.
+  AGENT_MD=""
+  for root in "$HOME/.gemini/config/plugins" "$HOME/.gemini/antigravity-cli/plugins"; do
+    [ -f "$root/agentic-sdlc/agents/contract-writer/agent.md" ] && AGENT_MD="$root/agentic-sdlc"
+  done
+  if [ -n "$AGENT_MD" ]; then
     ok "the contract-writer subagent is installed"
   else
     fail "the plugin has no contract-writer subagent in it" \
