@@ -234,43 +234,20 @@ nothing for it. It holds its own OAuth grant with its own scopes. Two logins,
 not one. There is no `agy login` subcommand; authentication happens on first
 use.
 
-Two ways to get a URL you can click. Either works. The first keeps you in this
-terminal, the second needs no widening.
-
-{{#collapse "Option 1: widen this terminal"}}
 ```bash
-COLS=$(tput cols); stty cols 2000; agy; stty cols "$COLS"
+FORCE_HYPERLINK=1 agy
 ```
-{{/collapse}}
 
-{{#collapse "Option 2: use the editor's terminal"}}
-**View → Terminal**, or `` Ctrl+` ``. A click there opens the whole link as it
-is, with no widening.
-
-```bash
-agy
-```
-{{/collapse}}
-
-You will be asked to open a URL, then to paste back a code. Click the URL,
-approve in the browser, copy the code it shows, paste it into the
-`authorization code...` field, press Enter, then leave with `/quit`.
+Click **Click here to authenticate**, approve in the browser, copy the code it
+shows, paste it into the `authorization code...` field, press Enter, then leave
+with `/quit`.
 
 {{#aside "positive"}}
-`agy` wraps the URL to the width the terminal reports, and the wrap is hard, so
-each line is a separate fragment. Clicking one sends an incomplete URL and
-Google answers `Error 400 (Bad Request)`, `invalid_request`. Reporting a width
-past the end of the URL removes the reason to wrap; the editor's terminal
-instead reads the hyperlink the escape codes carry, so the wrap does not matter
-there. The real width is captured and set back afterwards because nothing else
-restores it. `stty sane` resets the line discipline and leaves the size alone.
+`FORCE_HYPERLINK=1` is what makes that a single clickable link. This terminal
+runs inside tmux, and `agy` prints a plain wrapped URL when it sees that. The
+wrap is hard, so each row is its own fragment: clicking one sends half a URL and
+Google answers `Error 400 (Bad Request)`, `invalid_request`.
 {{/aside}}
-
-{{#walkthrough}}
-If you use the editor's terminal, come back to the one below afterwards. The
-terminal icon on each command block sends to that one, not to a terminal you
-opened yourself.
-{{/walkthrough}}
 
 The browser does not have to be on this machine. The redirect goes to a hosted
 callback rather than a localhost listener, which is what makes this work in
