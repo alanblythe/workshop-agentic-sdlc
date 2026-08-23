@@ -18,21 +18,6 @@
       color: red;
     }
   </style>
-<!-- collapse-sections -->
-<style>
-  details.clab-fold { margin: 16px 0; border-top: 1px solid #dadce0; }
-  details.clab-fold > summary {
-    cursor: pointer; list-style: none; padding: 12px 0;
-    font: 500 16px/1.4 Roboto, sans-serif; color: #202124;
-  }
-  details.clab-fold > summary::-webkit-details-marker { display: none; }
-  details.clab-fold > summary::before {
-    content: "\25B8"; display: inline-block; width: 1.2em;
-    color: #5f6368; transition: transform .15s ease;
-  }
-  details.clab-fold[open] > summary::before { transform: rotate(90deg); }
-  details.clab-fold > summary:hover { color: #1a73e8; }
-</style>
 </head>
 <body>
   <google-codelab-analytics gaid="" ga4id=""></google-codelab-analytics>
@@ -176,13 +161,10 @@ sudo apt update &amp;&amp; sudo apt install -y terraform
 <p class="image-container"><img alt="The agy login prompt: a wrapped URL, and below it the line reading &amp;lsquo;Click here to authenticate&amp;rsquo;" src="img/d843731c0fa7c666.png"></p>
 <aside class="warning"><p><strong>Do not click the long URL above it.</strong> It is wrapped across several rows and the wrap is hard, so each row is its own fragment. Clicking one sends half a URL, and Google answers <code>Error 400 (Bad Request)</code>, <code>invalid_request</code> — which reads like a broken sign-in rather than a broken link.</p>
 </aside>
-<details class="clab-fold"><summary>If you would rather not switch terminals</summary>
-<p>Cloud Shell&#39;s terminal panel runs inside tmux 2.1, which predates hyperlink support and strips the escape that makes <strong>Click here to authenticate</strong> clickable, so there that line is dead text. Widening past the end of the URL removes the reason to wrap, and one unbroken row is clickable on its own:</p>
-<pre><code language="language-bash" class="language-bash">COLS=$(tput cols); stty cols 2000; agy; stty cols &#34;$COLS&#34;
-</code></pre>
-<p>The real width is captured and set back because nothing else restores it. <code>stty sane</code> resets the line discipline and leaves the size alone.</p>
+<aside class="special"><p>Cloud Shell&#39;s own terminal panel runs inside tmux 2.1, which predates terminal hyperlinks and drops the escape that makes that line clickable. There it is dead text. The editor&#39;s terminal has no tmux in the way.</p>
+</aside>
 <p>The browser does not have to be on this machine. The redirect goes to a hosted callback rather than a localhost listener, which is what makes this work in Cloud Shell.</p>
-</details><h2 is-upgraded>Verify your work</h2>
+<h2 is-upgraded>Verify your work</h2>
 <pre><code language="language-bash" class="language-bash">agy -p &#34;Reply with exactly: authenticated&#34;
 </code></pre>
 <p>Answering without prompting for a URL means the grant is in place. Unlike the binary, it lives under <code>~/.gemini</code> and does survive a session recycle.</p>
