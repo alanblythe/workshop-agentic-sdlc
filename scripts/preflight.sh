@@ -66,7 +66,7 @@ blocker() { fail "$1" "$2"; BLOCKERS=$((BLOCKERS + 1)); }
 report_and_exit() {
   if [ "$FAILED" -eq 0 ]; then
     section "ready"
-    echo "  Everything checked out. Nothing to do until the session."
+    echo "  Everything is ready for the lab."
     exit 0
   fi
   section "$FAILED problem(s), each with the command that fixes it"
