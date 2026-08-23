@@ -154,14 +154,12 @@ sudo apt update &amp;&amp; sudo apt install -y terraform
       <google-codelab-step label="Authenticate agy" duration="3">
         <p><code>agy</code> has <strong>its own login, separate from </strong></p>
 <p><strong><code>gcloud</code></strong>. Authenticating gcloud does nothing for it. It holds its own OAuth grant with its own scopes. Two logins, not one. There is no <code>agy login</code> subcommand; authentication happens on first use.</p>
-<p>Do this one in <strong>the editor&#39;s terminal</strong> rather than Cloud Shell&#39;s own terminal panel: <strong>View → Terminal</strong>, or <code>Ctrl+`</code>.</p>
+<p>Do this one in <strong>the editor&#39;s terminal</strong>: <strong>View → Terminal</strong>, or <code>Ctrl+`</code>. The link you need is not clickable in Cloud Shell&#39;s own terminal panel.</p>
 <pre><code language="language-bash" class="language-bash">agy
 </code></pre>
 <p>Scroll past the long blue URL and click <strong>Click here to authenticate</strong> beneath it. Approve in the browser, copy the code it shows, paste it into the <code>authorization code...</code> field, press Enter, then leave with <code>/quit</code>.</p>
 <p class="image-container"><img alt="The agy login prompt: a wrapped URL, and below it the line reading &amp;lsquo;Click here to authenticate&amp;rsquo;" src="img/d843731c0fa7c666.png"></p>
 <aside class="warning"><p><strong>Do not click the long URL above it.</strong> It is wrapped across several rows and the wrap is hard, so each row is its own fragment. Clicking one sends half a URL, and Google answers <code>Error 400 (Bad Request)</code>, <code>invalid_request</code> — which reads like a broken sign-in rather than a broken link.</p>
-</aside>
-<aside class="special"><p>Cloud Shell&#39;s own terminal panel runs inside tmux 2.1, which predates terminal hyperlinks and drops the escape that makes that line clickable. There it is dead text. The editor&#39;s terminal has no tmux in the way.</p>
 </aside>
 <p>The browser does not have to be on this machine. The redirect goes to a hosted callback rather than a localhost listener, which is what makes this work in Cloud Shell.</p>
 <h2 is-upgraded>Verify your work</h2>
