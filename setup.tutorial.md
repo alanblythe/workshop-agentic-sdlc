@@ -193,8 +193,8 @@ nothing for it. It holds its own OAuth grant with its own scopes. Two logins,
 not one. There is no `agy login` subcommand; authentication happens on first
 use.
 
-Do this one in **the editor's terminal** rather than Cloud Shell's own terminal
-panel: **View → Terminal**, or `` Ctrl+` ``.
+Do this one in **the editor's terminal**: **View → Terminal**, or `` Ctrl+` ``.
+The link you need is not clickable in Cloud Shell's own terminal panel.
 
 ```bash
 agy
@@ -212,12 +212,6 @@ it. Approve in the browser, copy the code it shows, paste it into the
 > the wrap is hard, so each row is its own fragment. Clicking one sends half a
 > URL, and Google answers `Error 400 (Bad Request)`, `invalid_request` — which
 > reads like a broken sign-in rather than a broken link.
-
-> **Tip:**
->
-> Cloud Shell's own terminal panel runs inside tmux 2.1, which predates terminal
-> hyperlinks and drops the escape that makes that line clickable. There it is
-> dead text. The editor's terminal has no tmux in the way.
 
 Come back to the terminal below afterwards. The terminal icon on each command
 block sends there, not to a terminal you opened yourself.
