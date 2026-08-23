@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # LAB-01 follow-up: what `agy` looks like on Linux / Cloud Shell.
-# LAB-01 measured the macOS cask only. Everything here is read-only except one
-# plugin install, which is uninstalled again at the end.
+# LAB-01 measured the macOS cask only. Everything here is read-only.
 #
 #   bash scripts/probe-agy.sh 2>&1 | tee /tmp/agy-probe.txt
 set -uo pipefail
@@ -50,16 +49,8 @@ echo "disk used by ~/.gemini: $(du -sh ~/.gemini 2>/dev/null | cut -f1 || echo n
 hr "plugin surface (works unauthenticated)"
 timeout 30 agy plugin list </dev/null 2>&1 | head -20
 
-hr "install this repo as a plugin, then remove it"
-REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-echo "installing from: $REPO_ROOT"
-timeout 60 agy plugin install "$REPO_ROOT" </dev/null 2>&1 | head -8
-echo "--- list after ---"
-timeout 30 agy plugin list </dev/null 2>&1 | head -20
-echo "--- where did it land ---"
-find ~/.gemini -maxdepth 4 -name "agentic-sdlc" 2>/dev/null | head -3
-echo "--- uninstalling ---"
-timeout 60 agy plugin uninstall agentic-sdlc </dev/null 2>&1 | head -3
+hr "where an installed plugin lands"
+find ~/.gemini -maxdepth 4 -path "*/config/plugins/*" -maxdepth 5 2>/dev/null | head -10
 
 hr "auth state / prompt shape (12s cap, will not complete a login)"
 timeout 12 agy -p "Reply with exactly: ok" </dev/null 2>&1 | head -20

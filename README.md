@@ -241,10 +241,9 @@ repository by construction.
 
 Two distribution mechanisms, because they are two different conversations:
 
-- The **`agentic-sdlc`** plugin is installed from this repo, which students
-  install from and never fork. It currently carries no components: the
-  `contract-writer` subagent it used to hold is being tried as a workspace
-  agent in the lab repo instead.
+- The **adversary skill and the `contract-writer` subagent** ship in the lab
+  repo, the one the attendee forks, as workspace components under `.agents/`.
+  One definition, in the repository the run happens in.
 - **`local-spec-rules`** the attendee writes themselves in about five minutes, a rule from their own team's experience, added to the adversary. That is the
   authoring story: five lines of markdown, no approval, no release.
 
@@ -267,8 +266,6 @@ rules they are about to be refused by, and change them at the end. agy does not
 discover a skill sitting in a working directory, measured: `.agents/skills/`,
 `.gemini/skills/`, `skills/` and `.claude/skills/` under the workspace all load
 nothing, so being in the repo is not enough and the install is not optional.
-
-A root `plugin.json` makes this repo installable with `agy plugin install .`.
 
 The `contract-writer` subagent lives in the lab repo at
 `.agents/agents/contract-writer/`, where the attendee forks it. Whether a
@@ -378,8 +375,9 @@ Clone this repo and run `bash scripts/preflight.sh` **before the session**. It:
   any that are not
 - runs `agents-cli setup` and verifies the ADK skills landed in Antigravity's
   skill directory
-- installs the `agentic-sdlc` plugin and verifies it loads with
-  `agy plugin list`, which works without logging in
+- clones and installs **`geap-mcp`**, the plugin the lab dispatches its deployed
+  agent through, and verifies it with `agy plugin list`, which works without
+  logging in
 - validates `AGENT_ENGINE_LOCATION` and `MODEL_LOCATION` by **making a real call
   to `gemini-3.6-flash`**, not by reading the model catalog. A catalog entry
   describes the model, not your access to it

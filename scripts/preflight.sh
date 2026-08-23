@@ -391,25 +391,50 @@ if have uv; then
   fi
 fi
 
-# --- 11. the workshop plugin -----------------------------------------------
-# `agy plugin list` works unauthenticated, so this check does not require the
-# attendee to have logged in to agy yet.
-section "workshop plugin"
+# --- 11. the geap-mcp plugin -----------------------------------------------
+# The lab dispatches its deployed agent through this, so it has to be here
+# before the session. `agy plugin list` works unauthenticated, so this check
+# does not require the attendee to have logged in to agy yet.
+#
+# `agy plugin install` takes a directory, so the repo is cloned first. It is a
+# clone rather than a vendored copy because geap-mcp is used beyond this
+# workshop and has its own home.
+GEAP_MCP_REPO="https://github.com/alanblythe/geap-mcp"
+GEAP_MCP_DIR="${GEAP_MCP_DIR:-$HOME/geap-mcp}"
+
+section "geap-mcp plugin"
 
 if have agy; then
-  if agy plugin list 2>/dev/null | grep -q 'agentic-sdlc'; then
-    ok "agentic-sdlc is installed"
-  elif would "cd $REPO_ROOT && agy plugin install ."; then
-    info "installing agentic-sdlc from this clone"
-    ( cd "$REPO_ROOT" && agy plugin install . >/dev/null 2>&1 )
-    if agy plugin list 2>/dev/null | grep -q 'agentic-sdlc'; then
-      ok "agentic-sdlc installed"
+  if agy plugin list 2>/dev/null | grep -q 'geap-mcp'; then
+    ok "geap-mcp is installed"
+  elif would "clone $GEAP_MCP_REPO and install it as an agy plugin"; then
+    # Only install from a source we know we produced. git clone refuses a
+    # non-empty directory, and installing whatever was already sitting there
+    # would report success for a plugin nobody fetched.
+    SRC_READY=0
+    if [ -d "$GEAP_MCP_DIR/.git" ]; then
+      info "updating $GEAP_MCP_DIR"
+      git -C "$GEAP_MCP_DIR" pull --ff-only >/dev/null 2>&1 \
+        || warn "could not update $GEAP_MCP_DIR, installing what is there"
+      SRC_READY=1
     else
-      fail "agentic-sdlc did not install from $REPO_ROOT" \
-        "cd $REPO_ROOT && agy plugin install ."
+      info "cloning geap-mcp to $GEAP_MCP_DIR"
+      if git clone --depth 1 "$GEAP_MCP_REPO" "$GEAP_MCP_DIR" >/dev/null 2>&1; then
+        SRC_READY=1
+      else
+        fail "could not clone $GEAP_MCP_REPO into $GEAP_MCP_DIR" \
+          "rm -rf $GEAP_MCP_DIR && git clone $GEAP_MCP_REPO $GEAP_MCP_DIR"
+      fi
+    fi
+    if [ "$SRC_READY" -eq 1 ]; then
+      agy plugin install "$GEAP_MCP_DIR" >/dev/null 2>&1
+      agy plugin list 2>/dev/null | grep -q 'geap-mcp' \
+        && ok "geap-mcp installed" \
+        || fail "geap-mcp did not install from $GEAP_MCP_DIR" \
+             "agy plugin install $GEAP_MCP_DIR"
     fi
   else
-    warn "agentic-sdlc is not installed"
+    warn "geap-mcp is not installed"
   fi
 fi
 
@@ -510,8 +535,8 @@ for d in $SKILL_DIRS; do
 done
 [ -n "$FOUND" ] && ok "ADK skills present" || fail "ADK skills are not installed" 'agents-cli setup --agent antigravity'
 
-agy plugin list 2>/dev/null | grep -q 'agentic-sdlc' \
-  && ok "agentic-sdlc installed" \
-  || fail "agentic-sdlc is not installed" "cd $REPO_ROOT && agy plugin install ."
+agy plugin list 2>/dev/null | grep -q 'geap-mcp' \
+  && ok "geap-mcp installed" \
+  || fail "geap-mcp is not installed" "agy plugin install $GEAP_MCP_DIR"
 
 report_and_exit
