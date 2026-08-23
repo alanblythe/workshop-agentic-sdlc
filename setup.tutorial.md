@@ -213,19 +213,11 @@ it. Approve in the browser, copy the code it shows, paste it into the
 > URL, and Google answers `Error 400 (Bad Request)`, `invalid_request` — which
 > reads like a broken sign-in rather than a broken link.
 
-### If you would rather not switch terminals
-
-Cloud Shell's terminal panel runs inside tmux 2.1, which predates hyperlink
-support and strips the escape that makes **Click here to authenticate** clickable, so there
-that line is dead text. Widening past the end of the URL removes the reason to
-wrap, and one unbroken row is clickable on its own:
-
-```bash
-COLS=$(tput cols); stty cols 2000; agy; stty cols "$COLS"
-```
-
-The real width is captured and set back because nothing else restores it.
-`stty sane` resets the line discipline and leaves the size alone.
+> **Tip:**
+>
+> Cloud Shell's own terminal panel runs inside tmux 2.1, which predates terminal
+> hyperlinks and drops the escape that makes that line clickable. There it is
+> dead text. The editor's terminal has no tmux in the way.
 
 Come back to the terminal below afterwards. The terminal icon on each command
 block sends there, not to a terminal you opened yourself.
