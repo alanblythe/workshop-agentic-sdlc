@@ -227,51 +227,6 @@ Preflight checks this as well, but it runs to the end before reporting,
 including the Terraform apply. Fixing it here saves that wait.
 {{/aside}}
 
-{{step "Authenticate agy" 3}}
-
-`agy` has **its own login, separate from `gcloud`**. Authenticating gcloud does
-nothing for it. It holds its own OAuth grant with its own scopes. Two logins,
-not one. There is no `agy login` subcommand; authentication happens on first
-use.
-
-Do this one in **the editor's terminal**: **View → Terminal**, or `` Ctrl+` ``.
-The link you need is not clickable in Cloud Shell's own terminal panel.
-
-```bash
-agy
-```
-
-Scroll past the long blue URL and click **Click here to authenticate** beneath
-it. Approve in the browser, copy the code it shows, paste it into the
-`authorization code...` field, press Enter, then leave with `/quit`.
-
-{{image "docs/images/agy-login-click-here.png" "The agy login prompt: a wrapped URL, and below it the line reading 'Click here to authenticate'"}}
-
-{{#aside "negative"}}
-**Do not click the long URL above it.** It is wrapped across several rows and
-the wrap is hard, so each row is its own fragment. Clicking one sends half a
-URL, and Google answers `Error 400 (Bad Request)`, `invalid_request` — which
-reads like a broken sign-in rather than a broken link.
-{{/aside}}
-
-{{#walkthrough}}
-Come back to the terminal below afterwards. The terminal icon on each command
-block sends there, not to a terminal you opened yourself.
-{{/walkthrough}}
-
-The browser does not have to be on this machine. The redirect goes to a hosted
-callback rather than a localhost listener, which is what makes this work in
-Cloud Shell.
-
-### Verify your work
-
-```bash
-agy -p "Reply with exactly: authenticated"
-```
-
-Answering without prompting for a URL means the grant is in place. Unlike the
-binary, it lives under `~/.gemini` and does survive a session recycle.
-
 {{step "Let Terraform read your project" 1}}
 
 Preflight's Terraform turns on every API this workshop needs, except the one
@@ -328,6 +283,63 @@ A successful run ends with:
 If you are on a corporate network, the checks most likely to fail are npm and
 github reachability. Both are needed before any Google Cloud resource is
 involved, because the ADK skills install through `npx`.
+
+{{step "Authenticate agy" 3}}
+
+`agy` has **its own login, separate from `gcloud`**. Authenticating gcloud does
+nothing for it. It holds its own OAuth grant with its own scopes. Two logins,
+not one. There is no `agy login` subcommand; authentication happens on first
+use.
+
+Do this one in **the editor's terminal**: **View → Terminal**, or `` Ctrl+` ``.
+The link you need is not clickable in Cloud Shell's own terminal panel.
+
+```bash
+agy
+```
+
+It asks how you want to sign in. Either option works here:
+
+- **Google OAuth** — sign in with your Gemini Enterprise account and the project
+  that comes with it.
+- **Use a Google Cloud project** — point `agy` at the project you have been
+  configuring. This needs the Agent Platform API, `aiplatform.googleapis.com`,
+  which preflight has just enabled for you.
+
+[The Antigravity enterprise docs](https://antigravity.google/docs/enterprise/)
+cover both in full.
+
+Whichever you pick, scroll past the long blue URL and click **Click here to
+authenticate** beneath it. Approve in the browser, copy the code it shows,
+paste it into the `authorization code...` field, press Enter, then leave with
+`/quit`.
+
+{{image "docs/images/agy-login-click-here.png" "The agy login prompt: a wrapped URL, and below it the line reading 'Click here to authenticate'"}}
+
+{{#aside "negative"}}
+**Do not click the long URL above it.** It is wrapped across several rows and
+the wrap is hard, so each row is its own fragment. Clicking one sends half a
+URL, and Google answers `Error 400 (Bad Request)`, `invalid_request` — which
+reads like a broken sign-in rather than a broken link.
+{{/aside}}
+
+{{#walkthrough}}
+Come back to the terminal below afterwards. The terminal icon on each command
+block sends there, not to a terminal you opened yourself.
+{{/walkthrough}}
+
+The browser does not have to be on this machine. The redirect goes to a hosted
+callback rather than a localhost listener, which is what makes this work in
+Cloud Shell.
+
+### Verify your work
+
+```bash
+agy -p "Reply with exactly: authenticated"
+```
+
+Answering without prompting for a URL means the grant is in place. Unlike the
+binary, it lives under `~/.gemini` and does survive a session recycle.
 
 {{step "You're ready" 1}}
 
