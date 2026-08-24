@@ -18,8 +18,14 @@ Nothing you do is reported anywhere. The output is for you.
 - A Google Cloud project **with billing enabled**, where you are happy to
   create billed resources
 - A GitHub account, and the `gh` CLI logged in
-- Either Cloud Shell, or a laptop with `gcloud`, `terraform`, `uv`, `gh` and
-  Node installed
+- **Cloud Shell**, which is where the lab runs on the day
+
+> **Careful:**
+>
+> **Run this in Cloud Shell**, even though most of it would work on a laptop.
+> It is what proves Cloud Shell is turned on for your organisation — some
+> organisations disable it, and that is not something anyone can fix on the day.
+> It also leaves the toolchain in the `$HOME` the lab expects to find it in.
 
 ### What you'll end up with
 
