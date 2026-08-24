@@ -13,8 +13,10 @@ point is that it worked here, in their org, under their policies.
 
 Most agent demos are serial: you ask, the agent answers, you review. This
 workshop is about the next step, a developer and an agent building two halves
-of one feature **at the same time**, meeting at a seam that neither of them
-negotiated at runtime, because the spec declared it in advance.
+of one feature, meeting at a seam that neither of them negotiated at runtime,
+because the spec declared it in advance. The developer's half is the contract,
+the resolved spec and the acceptance tests a subagent writes from it. The
+agent's half is the implementation that has to pass them.
 
 ## Classroom
 
@@ -24,7 +26,7 @@ thing.
 
 | Evolution step | The need it creates | What answers it |
 | --- | --- | --- |
-| Line of code → page of code |, | Models |
+| Line of code → page of code | — | Models |
 | A developer instructing an agent | A repeatable way to define one | ADK, `agents-cli` |
 | Agents that outlive your terminal | Somewhere to run, an identity | Agent Platform, Sessions |
 | Agents that remember across runs | State beyond one conversation | Memory Bank |
@@ -59,7 +61,8 @@ ACME Corp: AT RISK
   2 open P1 tickets
 ```
 
-It starts from a request, not a spec:
+The starter tree is `scorer/main.py`, `scorer/tests/`, and the export in
+`fixtures/usage.csv`. It starts from a request, not a spec:
 
 > **Flag accounts before they churn**
 >
@@ -74,29 +77,30 @@ parallel.
 
 ### The seam
 
-| Half | Written by | Contract |
+| Half | Written by | Artifact |
 | --- | --- | --- |
-| `usage.py` | The deployed agent, unsupervised | `parse_usage(csv) -> list[MonthSnapshot]` |
-| `score.py` | The local agent, steered by you | `score(list[MonthSnapshot]) -> (score, tier, reasons)` |
+| What "done" means | `contract-writer`, steered by you | `scorer/tests/`, and the stubs it calls in `scorer/usage.py` |
+| Code that means it | The deployed agent, unsupervised | `scorer/usage.py` |
 
 Nobody hand-writes Python. Both halves are agent-written; what differs is
 whether anyone is watching.
 
-`MonthSnapshot` is the seam. The spec fixes it, along with the exact weights
-and tier thresholds, so that two parties working independently arrive at code
-that fits.
+`MonthSnapshot` is the seam inside the spec: `parse_usage` produces them and
+`score` consumes them, so each side is testable without the other's code. The
+spec fixes it, along with the exact weights and tier thresholds, so the
+assertions can be written before the implementation exists.
 
 ### The contract
 
-Three tests, emitted by the spec adversary and committed before either party
-starts. A contract is testable from both sides independently, that is what
-makes it a contract rather than a wish.
+Three tests, emitted by the `contract-writer` subagent the adversary hands off
+to, and committed before the agent starts. A contract is testable from both
+sides independently, that is what makes it a contract rather than a wish.
 
 | Test | Verifies | Asserts |
 | --- | --- | --- |
-| `test_parse_contract.py` | The deployed half, alone | `parse_usage(FIXTURE)` produces exactly this `list[MonthSnapshot]` |
-| `test_score_contract.py` | The local half, alone | `score(<longhand MonthSnapshot list>)` produces exactly this tier and reasons |
-| `test_integration.py` | Both, after merge | The two compose |
+| `test_parse_contract.py` | Parsing, alone | `parse_usage(FIXTURE)` produces exactly these snapshots |
+| `test_score_contract.py` | Scoring, alone | `score(<longhand MonthSnapshot list>)` produces exactly this tier and reasons |
+| `test_integration.py` | The two composed | Parse then score, end to end |
 
 The longhand `MonthSnapshot` list in your test is the seam, written out by hand.
 
@@ -107,43 +111,49 @@ attendee throughout.
 
 | # | Step | Duration |
 | --- | --- | --- |
-| 1 | Before you begin |, |
-| 2 | Fork the lab and connect your agent | 0:08 |
-| 3 | Scaffold the coder agent and start its deploy | 0:05 |
-| 4 | File the request | 0:03 |
-| 5 | **Grill the spec** | 0:15 |
-| 6 | Take the contract | 0:03 |
-| 7 | Dispatch, and watch both agents work | 0:08 |
-| 8 | Integrate and verify | 0:04 |
-| 9 | Teach the adversary a rule of your own | 0:06 |
-| 10 | Eval the adversary | 0:04 |
-| 11 | Clean up | 0:03 |
-| 12 | Congratulations |, |
-| | **Total** | **59 min** |
+| 1 | Before you begin | 0:02 |
+| 2 | Fork the lab repository | 0:03 |
+| 3 | Restore your Cloud Shell | 0:02 |
+| 4 | Deploy the coder-agent | 0:04 |
+| 5 | Read the request, then the spec | 0:06 |
+| 6 | **Interrogate the spec** | 0:12 |
+| 7 | Emit the contract | 0:08 |
+| 8 | Check the deploy landed | 0:03 |
+| 9 | Ensure git config is correct | 0:01 |
+| 10 | Give the agent a GitHub deploy key to your fork | 0:04 |
+| 11 | Dispatch coder-agent | 0:05 |
+| 12 | Read what it did | 0:06 |
+| 13 | Tear it down | 0:04 |
+| | **Total** | **60 min** |
 
-Fifty-nine minutes of content in the ninety-minute half. The slack is
-deliberate: this runs in a customer's environment, which nobody has tested.
+Sixty minutes of content in the ninety-minute half. The slack is deliberate:
+this runs in a customer's environment, which nobody has tested. The table is
+generated from the guide source into `agentic-sdlc-presenter/content-outline.md`
+on every publish; that copy is the one that cannot drift.
 
-**Step 3 starts the deploy and walks away.** It runs while steps 4–6 happen, and
-step 7 verifies it before dispatching. Waiting for a deploy teaches nothing.
+**Step 4 starts the deploy and walks away.** `--no-wait` returns as soon as the
+build is submitted, so it runs while steps 5–7 happen, and step 8 verifies it
+before dispatching. Waiting for a deploy teaches nothing.
 
-**Step 5 is the lab.** The adversary surfaces one ambiguity at a time and shows
-both readings and how they diverge, *empty `seats_active`: zero, so the account
-collapsed, or unknown, so skip the month?* You choose. It writes your choice
-into the spec and moves on. It finds them; **you** decide them.
+**Step 6 is the lab**, twelve of the sixty minutes. The adversary surfaces one
+ambiguity at a time and shows both readings and how they diverge, *empty
+`seats_active`: zero, so the account collapsed, or unknown, so skip the month?*
+You choose. It writes your choice into the spec and moves on. It finds them;
+**you** decide them.
 
-**Step 7 is what they came to see.** Two agents building one feature from one
-contract, neither able to see the other. The local one you steer; the deployed
-one nobody does.
+**Step 11 is what they came to see.** The agent works from the contract alone,
+on Agent Platform, narrating every file it reads and every command it runs.
+Watch which files it edits: only `scorer/usage.py` is inside the contract, and
+an edit naming a test is the agent changing what "done" means.
 
-**Step 8 is the point.** It fits because the contract was precise, not because
+**Step 12 is the point.** It fits because the contract was precise, not because
 anyone coordinated. Attendees who resolved an ambiguity differently still
-succeed, the adversary encoded *their* decision into *their* contract, and both
-agents coded against it. The lab does not require the right answer. It requires
+succeed, the adversary encoded *their* decision into *their* contract, and the
+agent coded against it. The lab does not require the right answer. It requires
 an answer, written down before work starts.
 
-Then the debrief line: *fifteen minutes deciding, five minutes building, and it
-fit first time. Which half did you expect to be the work?*
+Then the debrief line: *twenty minutes deciding what done means, five minutes
+dispatching, and it fit first time. Which half did you expect to be the work?*
 
 ## Architecture
 
@@ -152,34 +162,36 @@ Where a thing runs follows from what it does.
 | Party | Runs | Why there |
 | --- | --- | --- |
 | Spec adversary | Local, Antigravity CLI skill | Interactive, high-iteration, ephemeral. A round trip per turn would ruin it |
-| Local coder | Local, Antigravity CLI | Supervised. You approve each turn, so **you** are the contract |
-| Deployed coder | Agent Platform | Unsupervised, and working at the same time as you. **The test** is the contract |
+| `contract-writer` | Local, Antigravity CLI subagent | Supervised. You approve each turn, so **you** are the contract |
+| Deployed coder | Agent Platform | Unsupervised, holding to a contract you are not there to enforce. **The test** is the contract |
 
 That contrast is the lab's argument: you can only let an agent work
 unsupervised if something other than you is holding it to the spec.
 
-The coder agent is an ADK agent, scaffolded with `agents-cli`, wrapping the
-Antigravity SDK. Agent Platform is where an agent lives; the SDK is what an
-agent can do.
+The coder agent is an ADK agent wrapping the Antigravity SDK. It ships built
+in the lab repo and attendees deploy it with `agents-cli deploy`; nobody
+scaffolds one during the lab. Agent Platform is where an agent lives; the SDK
+is what an agent can do.
 
 ### Dispatch
 
 The agent is a Google API resource, not a public endpoint. The call is
-authorized by ADC, in Cloud Shell, the student's own identity, and held open
-for the duration so the trajectory streams back:
+authorized by ADC, in Cloud Shell, the student's own identity. Nothing on the
+public internet can reach that resource, so there is no inbound webhook and
+nothing inbound needs provisioning.
 
-```bash
-ENGINE="projects/$PROJECT/locations/$REGION/reasoningEngines/$ENGINE_ID"
+The lab dispatches through **`geap`**, the MCP server preflight installs, from
+inside `agy`: `list_agents` to find the engine, `start_query` with the job as a
+JSON string, then `read_query` in a loop against the cursor it returns.
+`scripts/dispatch.sh` in the lab repo is the same call in shell.
 
-curl -X POST "https://$REGION-aiplatform.googleapis.com/v1/$ENGINE:streamQuery" \
-  -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-  -d '{"class_method":"dispatch",
-       "input":{"repo":"git@github.com:you/fork.git",
-                "sha":"a1b2c3d","branch":"agent/parse"}}'
-```
-
-Nothing on the public internet can reach that resource, so there is no inbound
-webhook.
+Two things shape that route. The engine is a **container**, so the platform's
+`:streamQuery` returns 404 for it and the call goes to the container's own
+`stream_reasoning_engine` route under the project *number*; a 404 on a URL
+built from the right project and region reads like a missing agent rather than
+a wrong endpoint. And the invocation is capped at **600 seconds**, hard, so
+dispatch submits and polls rather than holding the connection. Closing it does
+not stop the agent, which is why the branch and not the stream is the display.
 
 ### Region
 
@@ -244,8 +256,10 @@ Two distribution mechanisms, because they are two different conversations:
 - The **adversary skill and the `contract-writer` subagent** ship in the lab
   repo, the one the attendee forks, as workspace components under `.agents/`.
   One definition, in the repository the run happens in.
-- **`local-spec-rules`** the attendee writes themselves in about five minutes, a rule from their own team's experience, added to the adversary. That is the
-  authoring story: five lines of markdown, no approval, no release.
+- **`local-spec-rules`** is the extension point rather than a step. The
+  published skill goes looking for it, so a team adds a rule from their own
+  experience without forking the skill: five lines of markdown, no approval,
+  no release.
 
 The published skill declares the seam that makes this deterministic:
 
@@ -260,17 +274,10 @@ because a model connected two files on its own. That is also the governance
 pattern in miniature: a published standard with a documented hook, extended
 without forking.
 
-The adversary skill ships in the **lab** repo, the one they fork, and the lab
-installs it from the clone at step 5. It is there so an attendee can read the
-rules they are about to be refused by, and change them at the end. agy does not
-discover a skill sitting in a working directory, measured: `.agents/skills/`,
-`.gemini/skills/`, `skills/` and `.claude/skills/` under the workspace all load
-nothing, so being in the repo is not enough and the install is not optional.
-
-The `contract-writer` subagent lives in the lab repo at
-`.agents/agents/contract-writer/`, where the attendee forks it. Whether a
-workspace agent is discovered at all is the open question that put it there:
-the documentation says it is, and `agy agents` lists nothing for it.
+Both are workspace components, discovered relative to where `agy` starts, so
+the lab's instruction is to start it from the clone of the fork and there is
+nothing to install. That is also why they are readable: an attendee can open
+the rules they are about to be refused by, and change them afterwards.
 
 A skill is only its `name` and `description` until something activates it; the
 body is loaded on demand. The description is what earns the invocation, so it
@@ -289,8 +296,8 @@ One rule decides which repo a thing belongs in: **do students fork it?**
 
 | Repo | Students | What it is | Contents |
 | --- | --- | --- | --- |
-| `workshop-agentic-sdlc` | Clone and install from. Never fork | **Preflight and materials** | This README, classroom outline, `guides/` and the `setup.lab.md` / `setup.tutorial.md` it renders, `scripts/preflight.sh`, `terraform/`, `agents/` |
-| `workshop-agentic-sdlc-lab` | Fork on the day | **Where the workshop day is spent** | The app, `docs/request.md`, `docs/spec.md`, `coder-agent/`, `scripts/setup-deploy-key.sh`, `lab.lab.md`, the codelab on Pages |
+| `workshop-agentic-sdlc` | Clone and install from. Never fork | **Preflight and materials** | This README, `guides/` and the `setup.lab.md` / `setup.tutorial.md` it renders, `scripts/preflight.sh`, `terraform/` |
+| `workshop-agentic-sdlc-lab` | Fork on the day | **Where the workshop day is spent** | The app, `docs/request.md`, `docs/spec.md`, `.agents/` with the skill and the subagent, `coder-agent/`, `scripts/`, `lab.lab.md`, the codelab on Pages |
 
 If it is used before the session, it belongs in the first. If the attendee
 touches it during the session, it belongs in the second, which is why the
@@ -324,9 +331,11 @@ Antigravity and links the skills into `~/.gemini/config/skills` and
 `~/.gemini/antigravity-cli/skills`.
 
 Without those skills the attendee has a coding agent that does not know how to
-scaffold, evaluate, or deploy an ADK agent, which is most of the lab. This is
-the single highest-value thing preflight does, and the one with the most ways
-to fail, because it reaches npm *and* GitHub before the fork is ever involved.
+scaffold, evaluate, or deploy an ADK agent. It is also the step with the most
+ways to fail, because it reaches npm *and* GitHub before the fork is ever
+involved. How much the lab leans on it is worth measuring: the day's `agy` work
+is the adversary, the subagent, and `geap`, and the deploy is a plain
+`agents-cli` command rather than a skill.
 
 ### Authoring the guides
 
@@ -375,9 +384,11 @@ Clone this repo and run `bash scripts/preflight.sh` **before the session**. It:
   any that are not
 - runs `agents-cli setup` and verifies the ADK skills landed in Antigravity's
   skill directory
-- clones and installs **`geap-mcp`**, the plugin the lab dispatches its deployed
-  agent through, and verifies it with `agy plugin list`, which works without
-  logging in
+- clones **`geap-mcp`**, the MCP server the lab dispatches its deployed agent
+  through, registers it with `agy mcp add` and verifies it with `agy mcp list`,
+  both of which work without logging in. Registered as a user server rather than
+  through a plugin, because a managed Google account never launches a
+  plugin-provided one
 - validates `AGENT_ENGINE_LOCATION` and `MODEL_LOCATION` by **making a real call
   to `gemini-3.6-flash`**, not by reading the model catalog. A catalog entry
   describes the model, not your access to it
@@ -410,7 +421,7 @@ does not exist yet. Day-of steps address resources by deterministic name rather
 than Terraform outputs, so it does not matter where or when preflight ran.
 
 Both of the lab's day-of blockers retire here: enabling APIs costs 10–15
-minutes the lab does not have, and a failed skill or plugin install sits
+minutes the lab does not have, and a failed skill or MCP server install sits
 directly upstream of the tool that produces the contract. A room where
 `agents-cli setup` failed silently is a room with no working agent toolchain,
 discovered at the worst possible moment.
@@ -425,31 +436,27 @@ gh auth login                                                  # device code
 gh repo fork OWNER/workshop-agentic-sdlc-lab --clone --remote
 ```
 
-Then `agents-cli` scaffolds the agent, you deploy it, and the deploy key is
-created and written into the secret.
+Then you deploy the agent that ships in the fork with `agents-cli deploy
+--agent-identity`, and the deploy key is created and written into the secret.
 
 ## Pacing
 
 The lab has one hard gate: **dispatch**. The agent needs wall-clock time to
 work, so an attendee who has not dispatched by the stated minute cannot reach
-step 7 at all. Everything else can slip.
+step 12 at all. Everything else can slip.
 
-The lab repo carries checkpoint branches for anyone behind:
+The lab repo carries one checkpoint branch for anyone behind,
+`checkpoint/6-contract-committed`, which is a facilitator's to hand out rather
+than a line in the guide. `agentic-sdlc-presenter/notes/recovery.md` has how
+and when.
 
-```bash
-git merge upstream/checkpoint/4-contract-committed
-```
-
-Fast finishers run the eval, then hunt a second seeded ambiguity.
+Fast finishers hunt a second seeded ambiguity, or change what the adversary
+refuses to decide for them.
 
 ## Open questions
 
-- **Timing.** The lab is ~73 minutes of content in a 90-minute half. That slack
+- **Timing.** The lab is 60 minutes of content in a 90-minute half. That slack
   is the only slack, and the customer has a next meeting.
-- **`claat`.** Verify the export invocation and that the generated output serves
-  correctly from Pages before building the guide around it.
 - **Reachability.** The fork, the deploy key, and the agent's push all assume
   `github.com`. An enterprise network that blocks it takes the lab to zero.
-- **Agent Runtime's maximum invocation duration.** If it is shorter than a
-  red-to-green loop, dispatch changes from streaming to submit-and-poll.
 - **Cloud Shell sizing** for the CLI. Cloud Workstations is the upgrade path.
