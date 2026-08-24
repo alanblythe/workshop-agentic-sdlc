@@ -208,7 +208,25 @@ gcloud services enable cloudresourcemanager.googleapis.com
 
 This checks everything above, then provisions your project.
 
-Look first if you like. With `--plan-only` it changes nothing at all:
+**What it checks, changing nothing:**
+
+- Your two locations are set
+- gcloud, terraform, uv, gh, npx, agy
+- npm registry and github reachable
+- Project readable, billing linked
+- `gemini-3.6-flash` answers a real call
+- `gh` is logged in
+
+**What it changes:**
+
+- Enables the APIs the lab needs
+- Installs the ADK skills
+- Clones and installs `geap-mcp`
+- Exports Terraform's credentials
+- Creates an empty deploy-key secret
+
+Look first if you like. With `--plan-only` it reports all of the above and
+changes none of it:
 
 ```bash
 bash scripts/preflight.sh --plan-only
@@ -220,10 +238,9 @@ Then run it for real:
 bash scripts/preflight.sh
 ```
 
-It verifies your tools, that npm and github are reachable, that billing is
-linked, that the APIs are on, and that `gemini-3.6-flash` genuinely answers for
-you, with a real call, because a catalog entry describes the model rather than
-your access to it. Then it applies the Terraform.
+The model is checked with a real call rather than a catalog lookup, because a
+catalog entry describes the model and not your access to it. Applying the
+Terraform is the last thing it does.
 
 > **Tip:**
 >
