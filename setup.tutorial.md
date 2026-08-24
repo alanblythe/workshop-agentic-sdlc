@@ -26,7 +26,7 @@ Nothing you do is reported anywhere. The output is for you.
 - The required APIs enabled on your project
 - An **empty** Secret Manager secret, waiting for a deploy key
 - `agy` updated and authenticated
-- The `geap-mcp` plugin installed, which the lab dispatches its agent through
+- `geap`, the MCP server the lab dispatches its agent through, registered
 
 > **Careful:**
 >
@@ -221,7 +221,7 @@ This checks everything above, then provisions your project.
 
 - Enables the APIs the lab needs
 - Installs the ADK skills
-- Clones and installs `geap-mcp`
+- Registers the `geap` MCP server
 - Exports Terraform's credentials
 - Creates an empty deploy-key secret
 

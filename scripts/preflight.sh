@@ -391,23 +391,28 @@ if have uv; then
   fi
 fi
 
-# --- 11. the geap-mcp plugin -----------------------------------------------
+# --- 11. the geap-mcp server -----------------------------------------------
 # The lab dispatches its deployed agent through this, so it has to be here
-# before the session. `agy plugin list` works unauthenticated, so this check
-# does not require the attendee to have logged in to agy yet.
+# before the session.
 #
-# `agy plugin install` takes a directory, so the repo is cloned first. It is a
-# clone rather than a vendored copy because geap-mcp is used beyond this
+# Registered with `agy mcp add`, NOT `agy plugin install`. A managed Google
+# account fetches admin controls at startup, and under those a plugin-provided
+# MCP server is never launched: it appears in the TUI's MCP view with no tools,
+# no error and nothing on stderr. A user-registered server starts normally on
+# the same account. Measured on Gemini Enterprise against a personal account,
+# agy 1.1.19.
+#
+# The repo is cloned rather than vendored because geap-mcp is used beyond this
 # workshop and has its own home.
 GEAP_MCP_REPO="https://github.com/alanblythe/geap-mcp"
 GEAP_MCP_DIR="${GEAP_MCP_DIR:-$HOME/geap-mcp}"
 
-section "geap-mcp plugin"
+section "geap-mcp server"
 
 if have agy; then
-  if agy plugin list 2>/dev/null | grep -q 'geap-mcp'; then
-    ok "geap-mcp is installed"
-  elif would "clone $GEAP_MCP_REPO and install it as an agy plugin"; then
+  if agy mcp list 2>/dev/null | grep -q 'geap'; then
+    ok "geap is registered"
+  elif would "clone $GEAP_MCP_REPO and register it with agy mcp add"; then
     # Only install from a source we know we produced. git clone refuses a
     # non-empty directory, and installing whatever was already sitting there
     # would report success for a plugin nobody fetched.
@@ -427,14 +432,17 @@ if have agy; then
       fi
     fi
     if [ "$SRC_READY" -eq 1 ]; then
-      agy plugin install "$GEAP_MCP_DIR" >/dev/null 2>&1
-      agy plugin list 2>/dev/null | grep -q 'geap-mcp' \
-        && ok "geap-mcp installed" \
-        || fail "geap-mcp did not install from $GEAP_MCP_DIR" \
-             "agy plugin install $GEAP_MCP_DIR"
+      # `--` so the leading -c reaches /bin/sh rather than being read as a flag
+      # by agy. The command is exec'd with no shell of its own, which is why
+      # /bin/sh is the command and the path is expanded inside it.
+      agy mcp add geap -- /bin/sh -c "exec '$GEAP_MCP_DIR'/bin/serve.sh" >/dev/null 2>&1
+      agy mcp list 2>/dev/null | grep -q 'geap' \
+        && ok "geap registered" \
+        || fail "geap did not register from $GEAP_MCP_DIR" \
+             "agy mcp add geap -- /bin/sh -c \"exec '$GEAP_MCP_DIR'/bin/serve.sh\""
     fi
   else
-    warn "geap-mcp is not installed"
+    warn "geap is not registered"
   fi
 fi
 
@@ -535,8 +543,9 @@ for d in $SKILL_DIRS; do
 done
 [ -n "$FOUND" ] && ok "ADK skills present" || fail "ADK skills are not installed" 'agents-cli setup --agent antigravity'
 
-agy plugin list 2>/dev/null | grep -q 'geap-mcp' \
-  && ok "geap-mcp installed" \
-  || fail "geap-mcp is not installed" "agy plugin install $GEAP_MCP_DIR"
+agy mcp list 2>/dev/null | grep -q 'geap' \
+  && ok "geap registered" \
+  || fail "geap is not registered" \
+       "agy mcp add geap -- /bin/sh -c \"exec '$GEAP_MCP_DIR'/bin/serve.sh\""
 
 report_and_exit
