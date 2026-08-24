@@ -311,7 +311,7 @@ cover both in full.
 Whichever you pick, scroll past the long blue URL and click **Click here to
 authenticate** beneath it. Approve in the browser, copy the code it shows,
 paste it into the `authorization code...` field, press Enter, then leave with
-`/quit`.
+`/exit`.
 
 ![The agy login prompt: a wrapped URL, and below it the line reading 'Click here to authenticate'](docs/images/agy-login-click-here.png)
 
