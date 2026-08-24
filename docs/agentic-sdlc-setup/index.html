@@ -211,7 +211,7 @@ sudo apt update &amp;&amp; sudo apt install -y terraform
 <li><strong>Use a Google Cloud project</strong> — point <code>agy</code> at the project you have been configuring. This needs the Agent Platform API, <code>aiplatform.googleapis.com</code>, which preflight has just enabled for you.</li>
 </ul>
 <p><a href="https://antigravity.google/docs/enterprise/" target="_blank">The Antigravity enterprise docs</a> cover both in full.</p>
-<p>Whichever you pick, scroll past the long blue URL and click <strong>Click here to authenticate</strong> beneath it. Approve in the browser, copy the code it shows, paste it into the <code>authorization code...</code> field, press Enter, then leave with <code>/quit</code>.</p>
+<p>Whichever you pick, scroll past the long blue URL and click <strong>Click here to authenticate</strong> beneath it. Approve in the browser, copy the code it shows, paste it into the <code>authorization code...</code> field, press Enter, then leave with <code>/exit</code>.</p>
 <p class="image-container"><img alt="The agy login prompt: a wrapped URL, and below it the line reading &amp;lsquo;Click here to authenticate&amp;rsquo;" src="img/d843731c0fa7c666.png"></p>
 <aside class="warning"><p><strong>Do not click the long URL above it.</strong> It is wrapped across several rows and the wrap is hard, so each row is its own fragment. Clicking one sends half a URL, and Google answers <code>Error 400 (Bad Request)</code>, <code>invalid_request</code> — which reads like a broken sign-in rather than a broken link.</p>
 </aside>
