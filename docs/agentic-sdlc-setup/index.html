@@ -163,13 +163,30 @@ sudo apt update &amp;&amp; sudo apt install -y terraform
     
       <google-codelab-step label="Run preflight" duration="3">
         <p>This checks everything above, then provisions your project.</p>
-<p>Look first if you like. With <code>--plan-only</code> it changes nothing at all:</p>
+<p><strong>What it checks, changing nothing:</strong></p>
+<ul>
+<li>Your two locations are set</li>
+<li>gcloud, terraform, uv, gh, npx, agy</li>
+<li>npm registry and github reachable</li>
+<li>Project readable, billing linked</li>
+<li><code>gemini-3.6-flash</code> answers a real call</li>
+<li><code>gh</code> is logged in</li>
+</ul>
+<p><strong>What it changes:</strong></p>
+<ul>
+<li>Enables the APIs the lab needs</li>
+<li>Installs the ADK skills</li>
+<li>Clones and installs <code>geap-mcp</code></li>
+<li>Exports Terraform&#39;s credentials</li>
+<li>Creates an empty deploy-key secret</li>
+</ul>
+<p>Look first if you like. With <code>--plan-only</code> it reports all of the above and changes none of it:</p>
 <pre><code language="language-bash" class="language-bash">bash scripts/preflight.sh --plan-only
 </code></pre>
 <p>Then run it for real:</p>
 <pre><code language="language-bash" class="language-bash">bash scripts/preflight.sh
 </code></pre>
-<p>It verifies your tools, that npm and github are reachable, that billing is linked, that the APIs are on, and that <code>gemini-3.6-flash</code> genuinely answers for you, with a real call, because a catalog entry describes the model rather than your access to it. Then it applies the Terraform.</p>
+<p>The model is checked with a real call rather than a catalog lookup, because a catalog entry describes the model and not your access to it. Applying the Terraform is the last thing it does.</p>
 <aside class="special"><p><strong>Failures do not stop it.</strong> Every problem is listed at the end with the exact command that fixes it, so you get the whole list in one run rather than discovering them one at a time. Fix them and run it again. It is safe to re-run, and safe to run in a fresh clone.</p>
 </aside>
 <h2 is-upgraded>Verify your work</h2>
