@@ -244,8 +244,8 @@ This checks everything above, then provisions your project.
 - Exports Terraform's credentials
 - Creates an empty deploy-key secret
 
-Look first if you like. With `--plan-only` it reports all of the above and
-changes none of it:
+Read it if you like: [`scripts/preflight.sh`](https://github.com/alanblythe/workshop-agentic-sdlc/blob/main/scripts/preflight.sh). And with
+`--plan-only` it reports all of the above and changes none of it:
 
 ```bash
 bash scripts/preflight.sh --plan-only
