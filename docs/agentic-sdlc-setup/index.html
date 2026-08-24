@@ -42,7 +42,7 @@
 <li>The required APIs enabled on your project</li>
 <li>An <strong>empty</strong> Secret Manager secret, waiting for a deploy key</li>
 <li><code>agy</code> updated and authenticated</li>
-<li>The <code>geap-mcp</code> plugin installed, which the lab dispatches its agent through</li>
+<li><code>geap</code>, the MCP server the lab dispatches its agent through, registered</li>
 </ul>
 <aside class="warning"><p><strong>Do not fork this repository.</strong> You clone it and run preflight from it. On the day you fork a <em>different</em> repository, the lab one. Forks do not copy issues, and the lab repo stays sealed until kickoff.</p>
 </aside>
@@ -176,7 +176,7 @@ sudo apt update &amp;&amp; sudo apt install -y terraform
 <ul>
 <li>Enables the APIs the lab needs</li>
 <li>Installs the ADK skills</li>
-<li>Clones and installs <code>geap-mcp</code></li>
+<li>Registers the <code>geap</code> MCP server</li>
 <li>Exports Terraform&#39;s credentials</li>
 <li>Creates an empty deploy-key secret</li>
 </ul>
