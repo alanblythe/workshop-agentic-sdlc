@@ -219,6 +219,11 @@ fi
 # reads as a wrong project id rather than a wrong identity.
 section "application default credentials"
 
+# A file is one way to have ADC and not the only one. Cloud Shell serves them
+# from the metadata server, so there is no file anywhere and credentials work
+# regardless -- checking for the file alone blocks every Cloud Shell attendee
+# on a problem they do not have. Ask whether ADC resolves; prefer the file when
+# there is one, because that is what pins Terraform to the same account.
 ADC_PATH="${GOOGLE_APPLICATION_CREDENTIALS:-${CLOUDSDK_CONFIG:-$HOME/.config/gcloud}/application_default_credentials.json}"
 if [ -r "$ADC_PATH" ]; then
   ok "ADC file: $ADC_PATH"
@@ -226,8 +231,13 @@ if [ -r "$ADC_PATH" ]; then
   if [ -n "${CLOUDSDK_CONFIG:-}" ]; then
     info "CLOUDSDK_CONFIG is set; exporting GOOGLE_APPLICATION_CREDENTIALS so Terraform uses the same account"
   fi
+elif gcloud auth application-default print-access-token >/dev/null 2>&1; then
+  # Minting a token is the check: it proves the whole chain resolves, which a
+  # file on disk does not.
+  ok "ADC resolves from the environment, with no file at $ADC_PATH"
+  info "Terraform will use the same chain; on Cloud Shell that is the metadata server"
 else
-  blocker "no application default credentials at $ADC_PATH. Terraform needs these, and they are separate from 'gcloud auth login'." \
+  blocker "no application default credentials: no file at $ADC_PATH, and none resolved from the environment. Terraform needs these, and they are separate from 'gcloud auth login'." \
     'gcloud auth application-default login'
 fi
 
